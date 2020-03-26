@@ -1,0 +1,35 @@
+{
+    "name": "bristol-su/assign-roles",
+    "description": "A module for the Bristol SU Portal Project to assign roles to members of groups",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Toby Twigger",
+            "email": "tobytwigger1@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "bristol-su/support": "^4.2"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BristolSU\\Module\\AssignRoles\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BristolSU\\Module\\Tests\\AssignRoles\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BristolSU\\Module\\AssignRoles\\ModuleServiceProvider"
+            ]
+        }
+    }
+}
