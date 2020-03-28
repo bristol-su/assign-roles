@@ -67,7 +67,7 @@
                 }
             },
             checkValueExists() {
-                if (this.value === undefined) {
+                if (this.value === undefined || this.value === null) {
                     this.value = [];
                 }
             }
