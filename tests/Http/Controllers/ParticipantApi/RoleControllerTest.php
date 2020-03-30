@@ -8,6 +8,8 @@ use BristolSU\ControlDB\Models\Group;
 use BristolSU\ControlDB\Models\Position;
 use BristolSU\ControlDB\Models\Role;
 use BristolSU\Module\AssignRoles\Http\Controllers\ParticipantApi\RoleController;
+use BristolSU\Module\AssignRoles\Http\Middleware\BindRoleRepository;
+use BristolSU\Module\AssignRoles\Support\LogicRoleRepository;
 use BristolSU\Module\AssignRoles\Support\PositionSettingRetrieval;
 use BristolSU\Module\Tests\AssignRoles\TestCase;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
@@ -127,18 +129,12 @@ class RoleControllerTest extends TestCase
             ->fail(null, $rolesNotInGroup[4]->group(), $rolesNotInGroup[4])
             ->otherwise(true);
 
-        $this->app->when(RoleController::class)
+        
+        $this->app->when(BindRoleRepository::class)
             ->needs(\BristolSU\Support\Logic\Contracts\LogicTester::class)
             ->give(function() {
                 return $this->logicTester();
             });
-        
-//        $logicAudience = $this->prophesize(LogicAudience::class);
-//        $logicAudience->roleAudience(Argument::that(function($arg) use ($logicGroup) {
-//            return $arg instanceof Logic && $arg->is($logicGroup);
-//        }))->shouldBeCalled()->willReturn(collect($rolesInLogicGroup));
-//        $this->instance(LogicAudience::class, $logicAudience->reveal());
-//        
         
         
         $response = $this->getJson($this->userApiUrl('/role'));

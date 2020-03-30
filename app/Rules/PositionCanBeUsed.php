@@ -5,6 +5,8 @@ namespace BristolSU\Module\AssignRoles\Rules;
 use BristolSU\ControlDB\Contracts\Repositories\Role;
 use BristolSU\Module\AssignRoles\Support\PositionSettingRetrieval;
 use BristolSU\Support\Authentication\Contracts\Authentication;
+use BristolSU\Support\Logic\Contracts\LogicRepository;
+use BristolSU\Support\Logic\Facade\LogicTester;
 use Illuminate\Contracts\Validation\Rule;
 
 class PositionCanBeUsed implements Rule
@@ -42,6 +44,7 @@ class PositionCanBeUsed implements Rule
         }
         if(in_array($value, $settings['only_one_role'])) {
             $roles = $this->roleRepository->allThroughGroup($this->group());
+            
             return $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($value) {
                 return $role->positionId() === (int) $value;
             })->count() === 0;

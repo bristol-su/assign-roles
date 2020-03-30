@@ -11,36 +11,17 @@ use BristolSU\Module\AssignRoles\Http\Requests\ParticipantApi\RoleController\Sto
 use BristolSU\Module\AssignRoles\Http\Requests\ParticipantApi\RoleController\UpdateRequest;
 use BristolSU\Support\Activity\Activity;
 use BristolSU\Support\Authentication\Contracts\Authentication;
-use BristolSU\Support\Logic\Contracts\LogicRepository;
-use BristolSU\Support\Logic\Contracts\LogicTester;
 use BristolSU\Support\ModuleInstance\ModuleInstance;
 
 class RoleController extends Controller
 {
 
-    /**
-     * @var LogicTester
-     */
-    private $logicTester;
-
-    public function __construct(LogicTester $logicTester)
-    {
-        $this->logicTester = $logicTester;
-    }
-
-    public function index(Activity $activity, ModuleInstance $moduleInstance, Role $role, Authentication $authentication, LogicRepository $logicRepository)
+    public function index(Activity $activity, ModuleInstance $moduleInstance, Role $role, Authentication $authentication)
     {
         $this->authorize('role.index');
         $roles = $role->allThroughGroup(
             $authentication->getGroup()
         );
-        if(settings('logic_group', null) !== null) {
-            $logic = $logicRepository->getById(settings('logic_group'));
-            
-            $roles = $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($logic) {
-                return $this->logicTester->evaluate($logic, null, $role->group(), $role);
-            })->values();
-        }
         
         return $roles->map(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
             $roleArray = $role->toArray();

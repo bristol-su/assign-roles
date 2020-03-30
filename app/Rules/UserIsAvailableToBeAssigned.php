@@ -49,9 +49,9 @@ class UserIsAvailableToBeAssigned implements Rule
             return false;
         }
         $user = $this->userRepository->getById($value);
-        $logic = app(LogicRepository::class)->getById($settings['logic_id']);
-        return $user->roles()->filter(function(Role $role) use ($settings, $logic, $user) {
-            return LogicTester::evaluate($logic, $user, $role->group(), $role) && in_array($role->id(), $settings['user_only_has_one_role']);
+
+        return $user->roles()->filter(function(Role $role) use ($settings, $user) {
+            return in_array($role->id(), $settings['user_only_has_one_role']);
         })->count() === 0;
     }
 
