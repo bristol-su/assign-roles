@@ -7,6 +7,7 @@ use BristolSU\ControlDB\Contracts\Models\Role;
 use BristolSU\ControlDB\Contracts\Repositories\Position;
 use BristolSU\Module\AssignRoles\Fields\RequiredPositions;
 use BristolSU\Module\AssignRoles\Support\RequiredSettingRetrieval;
+use BristolSU\Module\AssignRoles\Support\SettingRetrievalException;
 use BristolSU\Support\ActivityInstance\ActivityInstance;
 use BristolSU\Support\Completion\Contracts\CompletionCondition;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
@@ -24,7 +25,11 @@ class RequiredPositionsFilled extends CompletionCondition
      */
     public function isComplete($settings, ActivityInstance $activityInstance, ModuleInstance $moduleInstance): bool
     {
-       $remainingRoles = $this->rolesNeededtoFill($settings, $activityInstance, $moduleInstance);
+        try {
+            $remainingRoles = $this->rolesNeededtoFill($settings, $activityInstance, $moduleInstance);
+        } catch (SettingRetrievalException $e) {
+            return false;
+        }
        
        return count($remainingRoles) === 0;
     }
@@ -39,8 +44,12 @@ class RequiredPositionsFilled extends CompletionCondition
             return collect();
         }
 
-        $requiredPositions = $this->getRequiredPositions($settings, $group);
-        $remainingPositions = $this->rolesNeededtoFill($settings, $activityInstance, $moduleInstance);
+        try {
+            $requiredPositions = $this->getRequiredPositions($settings, $group);
+            $remainingPositions = $this->rolesNeededtoFill($settings, $activityInstance, $moduleInstance);
+        } catch (SettingRetrievalException $e) {
+            return false;
+        }
         
         if(count($requiredPositions) === 0) {
             return 100;
