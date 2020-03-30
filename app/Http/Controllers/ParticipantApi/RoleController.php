@@ -11,31 +11,37 @@ use BristolSU\Module\AssignRoles\Http\Requests\ParticipantApi\RoleController\Sto
 use BristolSU\Module\AssignRoles\Http\Requests\ParticipantApi\RoleController\UpdateRequest;
 use BristolSU\Support\Activity\Activity;
 use BristolSU\Support\Authentication\Contracts\Authentication;
-use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
-use BristolSU\Support\Logic\Facade\LogicTester;
+use BristolSU\Support\Logic\Contracts\LogicTester;
 use BristolSU\Support\ModuleInstance\ModuleInstance;
-use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
 
-    public function index(Activity $activity, ModuleInstance $moduleInstance, Role $role, Authentication $authentication, LogicRepository $logicRepository, LogicAudience $logicAudience)
+    /**
+     * @var LogicTester
+     */
+    private $logicTester;
+
+    public function __construct(LogicTester $logicTester)
+    {
+        $this->logicTester = $logicTester;
+    }
+
+    public function index(Activity $activity, ModuleInstance $moduleInstance, Role $role, Authentication $authentication, LogicRepository $logicRepository)
     {
         $this->authorize('role.index');
         $roles = $role->allThroughGroup(
             $authentication->getGroup()
         );
-        
         if(settings('logic_group', null) !== null) {
             $logic = $logicRepository->getById(settings('logic_group'));
-            $rolesInLogic = $logicAudience->roleAudience($logic)->map(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
-                return $role->id();
-            });
-            $roles = $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($rolesInLogic) {
-                return $rolesInLogic->contains($role->id());
-            });
+            
+            $roles = $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($logic) {
+                return $this->logicTester->evaluate($logic, null, $role->group(), $role);
+            })->values();
         }
+        
         return $roles->map(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
             $roleArray = $role->toArray();
             $roleArray['position'] = $role->position();

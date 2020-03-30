@@ -6,10 +6,12 @@ use BristolSU\ControlDB\Contracts\Models\Group;
 use BristolSU\ControlDB\Contracts\Models\Role;
 use BristolSU\ControlDB\Contracts\Repositories\Position;
 use BristolSU\Module\AssignRoles\Fields\RequiredPositions;
+use BristolSU\Module\AssignRoles\Support\RequiredSettingRetrieval;
 use BristolSU\Support\ActivityInstance\ActivityInstance;
 use BristolSU\Support\Completion\Contracts\CompletionCondition;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
+use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\Contracts\ModuleInstance;
 use FormSchema\Generator\Field;
 use FormSchema\Schema\Form;
@@ -69,12 +71,10 @@ class RequiredPositionsFilled extends CompletionCondition
         $logicGroupId = $moduleInstance->setting('logic_group', null);
         if($logicGroupId !== null) {
             $logic = app(LogicRepository::class)->getById($logicGroupId);
-            $rolesInLogic = app(LogicAudience::class)->roleAudience($logic)->map(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
-                return $role->id();
-            });
-            $roles = $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($rolesInLogic) {
-                return $rolesInLogic->contains($role->id());
-            });
+            
+            $roles = $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($logic) {
+                return LogicTester::evaluate($logic, null, $role->group(), $role);
+            })->values();
         }
         $roles = $roles->filter(function(Role $role) {
             return $role->users()->count() > 0;
@@ -146,18 +146,6 @@ class RequiredPositionsFilled extends CompletionCondition
 
     private function getRequiredPositions(array $settings, Group $group)
     {
-        foreach($settings['required'] as $setting) {
-            if (!array_key_exists('logic_id', $setting)) {
-                continue;
-            }
-            $logic = app(LogicRepository::class)->getById($setting['logic_id']);
-            $groups = collect(app(LogicAudience::class)->groupAudience($logic))->map(function (Group $group) {
-                return $group->id();
-            });
-            if($groups->contains($group->id())) {
-                return $setting['required'];
-            }
-        }
-        return [];
+        return app(RequiredSettingRetrieval::class)->getSettings($group, $settings);
     }
 }

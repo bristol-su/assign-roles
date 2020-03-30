@@ -7,9 +7,11 @@ use BristolSU\ControlDB\Models\DataRole;
 use BristolSU\ControlDB\Models\Group;
 use BristolSU\ControlDB\Models\Position;
 use BristolSU\ControlDB\Models\Role;
+use BristolSU\Module\AssignRoles\Http\Controllers\ParticipantApi\RoleController;
 use BristolSU\Module\AssignRoles\Support\PositionSettingRetrieval;
 use BristolSU\Module\Tests\AssignRoles\TestCase;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
+use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\Logic\Logic;
 use BristolSU\Support\ModuleInstance\Settings\ModuleInstanceSetting;
 use BristolSU\Support\Testing\FakesLogicTesters;
@@ -17,6 +19,8 @@ use Prophecy\Argument;
 
 class RoleControllerTest extends TestCase
 {
+    use FakesLogicTesters;
+    
     /** @test */
     public function index_returns_a_403_if_permission_not_owned(){
         $this->revokePermissionTo('assign-roles.role.index');
@@ -102,14 +106,42 @@ class RoleControllerTest extends TestCase
             $this->newRole(),
         ];
         
-        $logicAudience = $this->prophesize(LogicAudience::class);
-        $logicAudience->roleAudience(Argument::that(function($arg) use ($logicGroup) {
-            return $arg instanceof Logic && $arg->is($logicGroup);
-        }))->shouldBeCalled()->willReturn(collect($rolesInLogicGroup));
-        $this->instance(LogicAudience::class, $logicAudience->reveal());
+        $this->logicTester()
+            ->forLogic($logicGroup)
+            ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[0])
+            ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[1])
+            ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[2])
+            ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[3])
+            ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[4])
+            ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[5])
+            ->fail(null, $this->getControlGroup(), $rolesNotInLogicGroup[0])
+            ->fail(null, $this->getControlGroup(), $rolesNotInLogicGroup[1])
+            ->fail(null, $this->getControlGroup(), $rolesNotInLogicGroup[2])
+            ->fail(null, $this->getControlGroup(), $rolesNotInLogicGroup[3])
+            ->fail(null, $this->getControlGroup(), $rolesNotInLogicGroup[4])
+            ->fail(null, $this->getControlGroup(), $rolesNotInLogicGroup[5])
+            ->fail(null, $rolesNotInGroup[0]->group(), $rolesNotInGroup[0])
+            ->fail(null, $rolesNotInGroup[1]->group(), $rolesNotInGroup[1])
+            ->fail(null, $rolesNotInGroup[2]->group(), $rolesNotInGroup[2])
+            ->fail(null, $rolesNotInGroup[3]->group(), $rolesNotInGroup[3])
+            ->fail(null, $rolesNotInGroup[4]->group(), $rolesNotInGroup[4])
+            ->otherwise(true);
+
+        $this->app->when(RoleController::class)
+            ->needs(\BristolSU\Support\Logic\Contracts\LogicTester::class)
+            ->give(function() {
+                return $this->logicTester();
+            });
+        
+//        $logicAudience = $this->prophesize(LogicAudience::class);
+//        $logicAudience->roleAudience(Argument::that(function($arg) use ($logicGroup) {
+//            return $arg instanceof Logic && $arg->is($logicGroup);
+//        }))->shouldBeCalled()->willReturn(collect($rolesInLogicGroup));
+//        $this->instance(LogicAudience::class, $logicAudience->reveal());
+//        
+        
         
         $response = $this->getJson($this->userApiUrl('/role'));
-        
         $response->assertStatus(200);
         foreach($rolesInLogicGroup as $role) {
             $response->assertJsonFragment([

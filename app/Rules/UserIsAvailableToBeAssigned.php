@@ -6,6 +6,8 @@ use BristolSU\ControlDB\Contracts\Models\Role;
 use BristolSU\ControlDB\Contracts\Repositories\User;
 use BristolSU\Module\AssignRoles\Support\PositionSettingRetrieval;
 use BristolSU\Support\Authentication\Contracts\Authentication;
+use BristolSU\Support\Logic\Contracts\LogicRepository;
+use BristolSU\Support\Logic\Facade\LogicTester;
 use Illuminate\Contracts\Validation\Rule;
 
 /**
@@ -47,8 +49,9 @@ class UserIsAvailableToBeAssigned implements Rule
             return false;
         }
         $user = $this->userRepository->getById($value);
-        return $user->roles()->filter(function(Role $role) use ($settings) {
-            return in_array($role->id(), $settings['user_only_has_one_role']);
+        $logic = app(LogicRepository::class)->getById($settings['logic_id']);
+        return $user->roles()->filter(function(Role $role) use ($settings, $logic, $user) {
+            return LogicTester::evaluate($logic, $user, $role->group(), $role) && in_array($role->id(), $settings['user_only_has_one_role']);
         })->count() === 0;
     }
 

@@ -8,6 +8,7 @@ use BristolSU\ControlDB\Contracts\Repositories\Pivots\UserRole;
 use BristolSU\ControlDB\Models\Role;
 use BristolSU\Module\AssignRoles\Support\PositionSettingRetrieval;
 use BristolSU\Module\Tests\AssignRoles\TestCase;
+use BristolSU\Support\Logic\Logic;
 use BristolSU\Support\ModuleInstance\Settings\ModuleInstanceSetting;
 use BristolSU\Support\Permissions\Facade\PermissionTester;
 use Prophecy\Argument;
@@ -28,6 +29,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
@@ -36,7 +38,7 @@ class AssignControllerTest extends TestCase
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
         
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['role' => 'The role does not belong to your group']);
     }
@@ -53,6 +55,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
@@ -79,6 +82,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [$role->id()],
@@ -110,6 +114,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
@@ -136,6 +141,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
@@ -161,6 +167,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [$role->id()],
@@ -191,6 +198,7 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
+            'logic_id' => factory(Logic::class)->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],

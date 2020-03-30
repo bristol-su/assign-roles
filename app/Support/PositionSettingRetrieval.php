@@ -7,6 +7,7 @@ use BristolSU\ControlDB\Contracts\Repositories\Position;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 
 class PositionSettingRetrieval
 {
@@ -33,13 +34,17 @@ class PositionSettingRetrieval
 
     public function getSettings(Group $group)
     {
+        if(Cache::has($this->getCacheKey($group))) {
+            return Cache::get($this->getCacheKey($group));
+        }
         $settings = settings('position_settings', []);
         foreach ($settings as $setting) {
             if ($this->groupIsForSetting($group, $setting)) {
+                Cache::put($this->getCacheKey($group), $setting, 7200);
                 return $setting;
             }
         }
-        throw new Exception('Could not find a setting');
+        throw new SettingRetrievalException('Could not find a setting');
     }
 
     protected function groupIsForSetting(Group $group, array $setting): bool
@@ -54,6 +59,11 @@ class PositionSettingRetrieval
         return $groups->contains($group->id());
     }
 
+    protected function getCacheKey(Group $group)
+    {
+        return PositionSettingRetrieval::class . '.' . $group->id();
+    }
+    
     public function parse($setting)
     {
         foreach ($setting['allowed'] as $index => $id) {

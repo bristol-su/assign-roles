@@ -34,6 +34,7 @@ class PositionIsAllowed implements Rule
         } catch (\Exception $e) {
             return false;
         }
+        
         return in_array($value, $settings['allowed']);
     }
 
