@@ -4,11 +4,9 @@ namespace BristolSU\Module\AssignRoles\Support;
 
 use BristolSU\ControlDB\Contracts\Models\Group;
 use BristolSU\ControlDB\Contracts\Repositories\Position;
-use BristolSU\Support\Authentication\Contracts\Authentication;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
-use BristolSU\Support\Logic\Contracts\LogicTester;
-use Exception;
+use BristolSU\Support\Logic\Facade\LogicTester;
 use Illuminate\Support\Facades\Cache;
 
 class RequiredSettingRetrieval
@@ -39,10 +37,10 @@ class RequiredSettingRetrieval
         if(Cache::has($this->getCacheKey($group))) {
             return Cache::get($this->getCacheKey($group));
         }
-        foreach ($settings as $setting) {
+        foreach ((array_key_exists('required', $settings)?$settings['required']:[]) as $setting) {
             if ($this->groupIsForSetting($group, $setting)) {
-                Cache::put($this->getCacheKey($group), $setting, 7200);
-                return $setting;
+                Cache::put($this->getCacheKey($group), $setting['required'], 7200);
+                return $setting['required'];
             }
         }
         throw new SettingRetrievalException('Could not find a setting');
@@ -59,10 +57,7 @@ class RequiredSettingRetrieval
             return false;
         }
         $logic = $this->logicRepository->getById($setting['logic_id']);
-        $groups = collect($this->logicAudience->groupAudience($logic))->map(function (Group $group) {
-            return $group->id();
-        });
-        return $groups->contains($group->id());
+        return LogicTester::evaluate($logic, null, $group, null);
     }
 
 }

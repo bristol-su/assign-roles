@@ -8,7 +8,7 @@ use BristolSU\ControlDB\Contracts\Repositories\Pivots\UserRole;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use Illuminate\Support\Collection;
 
-class LogicUserGroupRepository implements UserRole
+class LogicUserRoleRepository implements UserRole
 {
 
     /**

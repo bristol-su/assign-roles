@@ -2,11 +2,10 @@
 
 namespace BristolSU\Module\AssignRoles\Http\Middleware;
 
-use BristolSU\ControlDB\Contracts\Repositories\Pivots\UserGroup;
 use BristolSU\ControlDB\Contracts\Repositories\Pivots\UserRole;
 use BristolSU\ControlDB\Contracts\Repositories\Role;
 use BristolSU\Module\AssignRoles\Support\LogicRoleRepository;
-use BristolSU\Module\AssignRoles\Support\LogicUserGroupRepository;
+use BristolSU\Module\AssignRoles\Support\LogicUserRoleRepository;
 use BristolSU\Support\Logic\Contracts\LogicTester;
 use Illuminate\Http\Request;
 
@@ -30,7 +29,7 @@ class BindRoleRepository
         });
 
         app()->extend(UserRole::class, function($userRole, $app) {
-            return new LogicUserGroupRepository($userRole, $this->logicTester);
+            return new LogicUserRoleRepository($userRole, $this->logicTester);
         });
         
         return $next($request);
