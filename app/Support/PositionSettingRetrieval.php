@@ -36,13 +36,9 @@ class PositionSettingRetrieval
 
     public function getSettings(Group $group)
     {
-        if(Cache::has($this->getCacheKey($group))) {
-            return Cache::get($this->getCacheKey($group));
-        }
         $settings = settings('position_settings', []);
         foreach ($settings as $setting) {
             if ($this->groupIsForSetting($group, $setting)) {
-                Cache::put($this->getCacheKey($group), $setting, 7200);
                 return $setting;
             }
         }
