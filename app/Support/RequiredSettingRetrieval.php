@@ -4,8 +4,10 @@ namespace BristolSU\Module\AssignRoles\Support;
 
 use BristolSU\ControlDB\Contracts\Models\Group;
 use BristolSU\ControlDB\Contracts\Repositories\Position;
+use BristolSU\Support\Authentication\Contracts\Authentication;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
+use BristolSU\Support\Logic\Contracts\LogicTester;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
@@ -53,10 +55,15 @@ class RequiredSettingRetrieval
     
     protected function groupIsForSetting(Group $group, array $setting): bool
     {
+        $user = app(Authentication::class)->getUser();
+        $role = app(Authentication::class)->getRole();
+
         if (!array_key_exists('logic_id', $setting)) {
             return false;
         }
         $logic = $this->logicRepository->getById($setting['logic_id']);
+        return app(LogicTester::class)->evaluate($logic, $user, $group, $role);
+        
         $groups = collect($this->logicAudience->groupAudience($logic))->map(function (Group $group) {
             return $group->id();
         });
