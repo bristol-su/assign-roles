@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-table :fields="fields" :items="roles">
+        <b-table :fields="fields" :items="roles" :busy="loadingRoles">
             <template v-slot:cell(assigned)="data">
                 <assigned-user v-for="user in data.item.users" :key="user.id" :user="user" :role="data.item"></assigned-user>
                 <add-user :role="data.item" :available-users="availableUsers" :assigned-users="data.item.users" :only-one-user="onlyOneUser" ></add-user>
@@ -73,15 +73,18 @@
                     {key: 'actions', label: 'Actions'},
                 ],
                 roles: [],
-                members: []
+                members: [],
+                loadingRoles: false
             }
         },
 
         methods: {
             loadRoles() {
+                this.loadingRoles = true;
                 this.$http.get('role')
                     .then(response => this.roles = response.data)
-                    .catch(error => this.$notify.alert('Could not load the roles: ' + error.message));
+                    .catch(error => this.$notify.alert('Could not load the roles: ' + error.message))
+                    .then(() => this.loadingRoles = false);
             },
             loadMembers() {
                 this.$http.get('/members')

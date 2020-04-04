@@ -8,6 +8,7 @@ use BristolSU\ControlDB\Contracts\Repositories\Pivots\UserRole;
 use BristolSU\ControlDB\Models\Role;
 use BristolSU\Module\AssignRoles\Support\PositionSettingRetrieval;
 use BristolSU\Module\Tests\AssignRoles\TestCase;
+use BristolSU\Support\Authentication\Contracts\Authentication;
 use BristolSU\Support\Logic\Logic;
 use BristolSU\Support\ModuleInstance\Settings\ModuleInstanceSetting;
 use BristolSU\Support\Permissions\Facade\PermissionTester;
@@ -247,6 +248,54 @@ class AssignControllerTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['user' => 'The user does not belong to the role']);
+    }
+
+    /** @test */
+    public function destroy_returns_a_422_if_the_user_is_logged_into_the_current_role_being_unassigned(){
+        $this->givePermissionTo('assign-roles.unassign');
+        PermissionTester::clearResolvedInstance(\BristolSU\Support\Permissions\Contracts\PermissionTester::class);
+
+        $role = $this->newRole(['group_id' => $this->getControlGroup()->id()]);
+        $this->beRole($role);
+        app(UserRole::class)->addUserToRole($this->getControlUser(), $role);
+        
+        $this->assertDatabaseHas('control_role_user', [
+            'user_id' => $this->getControlUser()->id(),
+            'role_id' => $role->id(),
+            'deleted_at' => null
+        ]);
+
+        $response = $this->deleteJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $this->getControlUser()->id())));
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['role' => 'You cannot unassign a role you are logged in as']);
+
+    }
+
+    /** @test */
+    public function destroy_removes_the_user_from_the_role_if_same_role_as_current_user_but_different_user(){
+        $this->givePermissionTo('assign-roles.unassign');
+        PermissionTester::clearResolvedInstance(\BristolSU\Support\Permissions\Contracts\PermissionTester::class);
+
+        $role = $this->newRole(['group_id' => $this->getControlGroup()->id()]);
+        $user = $this->newUser();
+        app(UserRole::class)->addUserToRole($user, $role);
+        app(UserRole::class)->addUserToRole($this->getControlUser(), $role);
+
+        $this->assertDatabaseHas('control_role_user', [
+            'user_id' => $user->id(),
+            'role_id' => $role->id(),
+            'deleted_at' => null
+        ]);
+
+        $response = $this->deleteJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
+
+        $response->assertStatus(200);
+        $this->assertSoftDeleted('control_role_user', [
+            'user_id' => $user->id(),
+            'role_id' => $role->id()
+        ]);
+
     }
     
     /** @test */

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div style="text-align: right;">
+        <div style="text-align: right;" v-if="positions.length > 0">
             <b-button size="lg" variant="outline-info" v-b-modal.add-role>Add Role</b-button>
         </div>
         

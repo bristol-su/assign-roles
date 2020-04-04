@@ -10,6 +10,7 @@ use BristolSU\Module\AssignRoles\Http\Controllers\Controller;
 use BristolSU\Module\AssignRoles\Http\Requests\ParticipantApi\AssignController\DestroyRequest;
 use BristolSU\Module\AssignRoles\Http\Requests\ParticipantApi\AssignController\UpdateRequest;
 use BristolSU\Support\Activity\Activity;
+use BristolSU\Support\Authentication\Contracts\Authentication;
 use BristolSU\Support\ModuleInstance\ModuleInstance;
 
 class AssignController extends Controller
