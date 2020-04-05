@@ -1,7 +1,13 @@
 <template>
     <div>
         <b-table :fields="fields" :items="roles" :busy="loadingRoles">
-            <template v-slot:cell(assigned)="data">
+            <template v-slot:table-busy>
+                <div class="text-center text-danger my-2">
+                    <b-spinner class="align-middle"></b-spinner>
+                    <strong>Loading...</strong>
+                </div>
+            </template>
+	    <template v-slot:cell(assigned)="data">
                 <assigned-user v-for="user in data.item.users" :key="user.id" :user="user" :role="data.item"></assigned-user>
                 <add-user :role="data.item" :available-users="availableUsers" :assigned-users="data.item.users" :only-one-user="onlyOneUser" ></add-user>
             </template>
