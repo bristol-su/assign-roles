@@ -72,10 +72,10 @@
         data() {
             return {
                 fields: [
-                    {key: 'position.data.name', label: 'Position Name'},
-                    {key: 'data.role_name', label: 'Role Name'},
-                    {key: 'data.email', label: 'Role Email'},
-                    {key: 'assigned', label: 'Assigned To'},
+                    {key: 'position.data.name', label: 'Position Type'},
+                    {key: 'data.role_name', label: 'Role Title'},
+                    {key: 'data.email', label: 'Generic Email'},
+                    {key: 'assigned', label: 'Name(s) of post holder(s)'},
                     {key: 'actions', label: 'Actions'},
                 ],
                 roles: [],

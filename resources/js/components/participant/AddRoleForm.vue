@@ -3,16 +3,16 @@
         <b-form @submit.prevent="createRole">
             <b-form-group
                     id="position-id-group"
-                    label="Position:"
+                    label="Position Type"
                     label-for="position-id"
-                    description="What position is this role in?"
+                    description="What type of role is this?"
             >
                 <b-form-select v-model="positionId" :options="positionOptions" required></b-form-select>
             </b-form-group>
 
             <b-form-group
                     id="role-name-group"
-                    label="Role Name:"
+                    label="Role Title"
                     label-for="role-name"
                     description="What should the role be called?"
             >
@@ -26,9 +26,9 @@
 
             <b-form-group
                     id="role-email-group"
-                    label="Role Email:"
+                    label="Generic Role Email"
                     label-for="role-email"
-                    description="Is there an email for this role?"
+                    description="Is there a generic email for this role, e.g. president@society.co.uk?"
             >
                 <b-form-input
                         id="role-email"

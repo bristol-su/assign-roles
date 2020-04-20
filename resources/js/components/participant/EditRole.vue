@@ -10,7 +10,7 @@
                 <b-form-group
                         description="What should the role be called?"
                         id="role-name-group"
-                        label="Role Name:"
+                        label="Role Title"
                         label-for="role-name"
                 >
                     <b-form-input
@@ -22,10 +22,10 @@
                 </b-form-group>
 
                 <b-form-group
-                        description="Is there an email for this role?"
                         id="role-email-group"
-                        label="Role Email:"
+                        label="Generic Role Email"
                         label-for="role-email"
+                        description="Is there a generic email for this role, e.g. president@society.co.uk?"
                 >
                     <b-form-input
                             id="role-email"
