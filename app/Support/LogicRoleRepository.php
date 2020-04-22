@@ -118,4 +118,27 @@ class LogicRoleRepository implements Role
         }
         return $roles;
     }
+
+    /**
+     * Paginate through all the roles
+     *
+     * @param int $page The page number to return
+     * @param int $perPage The number of results to return per page
+     *
+     * @return Collection|RoleModel[]
+     */
+    public function paginate(int $page, int $perPage): Collection
+    {
+        return $this->filter($this->roleRepository->all())->forPage($page, $perPage);
+    }
+
+    /**
+     * Get the number of roles
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return $this->filter($this->roleRepository->all())->count();
+    }
 }
