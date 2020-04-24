@@ -141,4 +141,18 @@ class LogicRoleRepository implements Role
     {
         return $this->filter($this->roleRepository->all())->count();
     }
+
+    /**
+     * Update the role model
+     *
+     * @param int $id
+     * @param int $positionId
+     * @param int $groupId
+     * @param int $dataProviderId New data provider ID
+     * @return RoleModel
+     */
+    public function update(int $id, int $positionId, int $groupId, int $dataProviderId): RoleModel
+    {
+        return $this->roleRepository->update($id, $positionId, $groupId, $dataProviderId);
+    }
 }
