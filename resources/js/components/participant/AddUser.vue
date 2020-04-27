@@ -9,7 +9,9 @@
                     label="Search for a user"
                     label-for="user-search"
             >
-                <b-form-select v-model="selectedUser" :options="options"></b-form-select>
+                <b-form-select v-model="selectedUser" :options="options">
+                    <b-form-select-option :value="null" disabled>-- Please select a user --</b-form-select-option>
+                </b-form-select>
             </b-form-group>
             
             <b-button @click="addUser" v-if="selectedUser !== null">
@@ -75,7 +77,7 @@
                 return 'Add a user to ' + this.role.data.role_name;
             },
             options() {
-                return this.availableUsers.filter(member => this.assignedUsers.filter(u => u.id === member.id).length === 0)
+                return this.availableUsers.sort((a, b) => a.data.first_name.localeCompare(b.data.first_name)).filter(member => this.assignedUsers.filter(u => u.id === member.id).length === 0)
                     .map(member => {
                     return {value: member.id, text: member.data.first_name + ' ' + member.data.last_name}
                 })

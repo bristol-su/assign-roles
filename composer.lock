@@ -4,28 +4,29 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ddff46b7c58a50a22192ac0fba8d7c01",
+    "content-hash": "22984de3c1281b944b530b8fe5f7e248",
     "packages": [
         {
             "name": "bristol-su/control",
-            "version": "dev-develop",
+            "version": "v2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bristol-su/control.git",
-                "reference": "4981135ec3c49d592cf6ba6fe38896bf748fbd03"
+                "reference": "5cc6ab65453cb42ed35b25d50b3f362ebbf758d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bristol-su/control/zipball/4981135ec3c49d592cf6ba6fe38896bf748fbd03",
-                "reference": "4981135ec3c49d592cf6ba6fe38896bf748fbd03",
+                "url": "https://api.github.com/repos/bristol-su/control/zipball/5cc6ab65453cb42ed35b25d50b3f362ebbf758d3",
+                "reference": "5cc6ab65453cb42ed35b25d50b3f362ebbf758d3",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.2"
+                "php": "^7.3"
             },
             "require-dev": {
                 "orchestra/testbench": "^4.0",
+                "phpspec/prophecy-phpunit": "2.0.0",
                 "phpstan/phpstan": "^0.12.8"
             },
             "type": "library",
@@ -57,7 +58,7 @@
                 }
             ],
             "description": "An implementation of the control contracts",
-            "time": "2020-04-24T16:36:35+00:00"
+            "time": "2020-04-27T14:28:22+00:00"
         },
         {
             "name": "bristol-su/support",
@@ -4762,23 +4763,20 @@
         },
         {
             "name": "phpdocumentor/reflection-common",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
-                "reference": "63a995caa1ca9e5590304cd845c15ad6d482a62a"
+                "reference": "6568f4687e5b41b054365f9ae03fcb1ed5f2069b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/63a995caa1ca9e5590304cd845c15ad6d482a62a",
-                "reference": "63a995caa1ca9e5590304cd845c15ad6d482a62a",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/6568f4687e5b41b054365f9ae03fcb1ed5f2069b",
+                "reference": "6568f4687e5b41b054365f9ae03fcb1ed5f2069b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~6"
             },
             "type": "library",
             "extra": {
@@ -4810,7 +4808,7 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2018-08-07T13:53:10+00:00"
+            "time": "2020-04-27T09:25:28+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -5375,16 +5373,16 @@
         },
         {
             "name": "sebastian/code-unit",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/code-unit.git",
-                "reference": "8d8f09bd47c75159921e6e84fdef146343962866"
+                "reference": "00d2094a93573796ec6666401be467fa6efcd86a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/8d8f09bd47c75159921e6e84fdef146343962866",
-                "reference": "8d8f09bd47c75159921e6e84fdef146343962866",
+                "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/00d2094a93573796ec6666401be467fa6efcd86a",
+                "reference": "00d2094a93573796ec6666401be467fa6efcd86a",
                 "shasum": ""
             },
             "require": {
@@ -5417,7 +5415,7 @@
             ],
             "description": "Collection of value objects that represent the PHP code units",
             "homepage": "https://github.com/sebastianbergmann/code-unit",
-            "time": "2020-03-30T11:59:20+00:00"
+            "time": "2020-04-27T06:25:01+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -6126,18 +6124,9 @@
             "time": "2020-04-18T12:12:48+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "2.0",
-            "alias_normalized": "2.0.0.0",
-            "version": "dev-develop",
-            "package": "bristol-su/control"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "bristol-su/control": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

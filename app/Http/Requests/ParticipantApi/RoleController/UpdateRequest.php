@@ -16,7 +16,7 @@ class UpdateRequest  extends FormRequest
             [
                 'role' => ['required', app(RoleBelongsToGroup::class)],
                 'role_name' => ['sometimes', 'string', 'min:3', 'max:255'],
-                'email' => ['sometimes', 'email']
+                'email' => ['sometimes', 'nullable', 'email']
             ]
         );
     }

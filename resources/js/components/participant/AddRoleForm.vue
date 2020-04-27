@@ -7,7 +7,9 @@
                     label-for="position-id"
                     description="What type of role is this?"
             >
-                <b-form-select v-model="positionId" :options="positionOptions" required></b-form-select>
+                <b-form-select v-model="positionId" :options="positionOptions" required>
+                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                </b-form-select>
             </b-form-group>
 
             <b-form-group
@@ -80,8 +82,8 @@
             createRole() {
                 this.$http.post('/role', {
                     position_id: this.positionId,
-                    role_name: this.role_name,
-                    email: this.email
+                    role_name: (this.role_name === ''?null:this.role_name),
+                    email: (this.email === ''?null:this.email)
                 })
                     .then(response => {
                         this.$notify.success('Created the role');

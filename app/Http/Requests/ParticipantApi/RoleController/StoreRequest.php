@@ -14,7 +14,7 @@ class StoreRequest extends FormRequest
         return [
             'position_id' => ['required', app(PositionIsAllowed::class),  app(PositionCanBeUsed::class)],
             'role_name' => ['required', 'string', 'max:255', 'min:3'],
-            'email' => ['nullable', 'sometimes', 'email']
+            'email' => ['sometimes', 'nullable', 'email']
         ];
     }
     
