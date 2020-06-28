@@ -8,6 +8,7 @@ use BristolSU\Support\Authentication\Contracts\Authentication;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Contracts\LogicTester;
+use BristolSU\Support\ModuleInstance\ModuleInstance;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
@@ -63,7 +64,11 @@ class PositionSettingRetrieval
 
     protected function getCacheKey(Group $group)
     {
-        return PositionSettingRetrieval::class . '.' . $group->id();
+        $moduleInstance = app(ModuleInstance::class);
+        if($moduleInstance->exists) {
+            throw new \Exception('Module instance was used in ' . static::class . ' but was not bound to the container');
+        }
+        return PositionSettingRetrieval::class . '.' . $moduleInstance->id() . '.' . $group->id();
     }
     
     public function parse($setting)

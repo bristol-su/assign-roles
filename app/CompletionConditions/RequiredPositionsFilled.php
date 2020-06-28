@@ -7,18 +7,15 @@ use BristolSU\ControlDB\Contracts\Models\Role;
 use BristolSU\ControlDB\Contracts\Repositories\Position;
 use BristolSU\ControlDB\Contracts\Repositories\Role as RoleRepository;
 use BristolSU\Module\AssignRoles\Fields\RequiredPositions;
-use BristolSU\Module\AssignRoles\Support\LogicRoleRepository;
 use BristolSU\Module\AssignRoles\Support\RequiredSettingRetrieval;
 use BristolSU\Module\AssignRoles\Support\SettingRetrievalException;
 use BristolSU\Support\ActivityInstance\ActivityInstance;
 use BristolSU\Support\Completion\Contracts\CompletionCondition;
-use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\Contracts\ModuleInstance;
 use FormSchema\Generator\Field;
 use FormSchema\Schema\Form;
-use Illuminate\Support\Collection;
 
 class RequiredPositionsFilled extends CompletionCondition
 {
@@ -53,7 +50,7 @@ class RequiredPositionsFilled extends CompletionCondition
         $group = $this->getGroup($activityInstance);
 
         try {
-            $requiredPositions = $this->getRequiredPositions($settings, $group);
+            $requiredPositions = $this->getRequiredPositions($settings, $group, $moduleInstance);
             $remainingPositions = $this->positionsStillToFill($settings, $activityInstance, $moduleInstance);
         } catch (SettingRetrievalException $e) {
             return false;
@@ -80,7 +77,7 @@ class RequiredPositionsFilled extends CompletionCondition
             return $role->users()->count() > 0;
         });
         
-        return collect($this->getRequiredPositions($settings, $group))->filter(function(int $positionId) use ($roles) {
+        return collect($this->getRequiredPositions($settings, $group, $moduleInstance))->filter(function(int $positionId) use ($roles) {
             return $roles->filter(function(Role $role) use ($positionId) {
                 return $role->positionId() === $positionId;
             })->count() === 0;
@@ -158,9 +155,9 @@ class RequiredPositionsFilled extends CompletionCondition
         return $activityInstance->participant()->group();
     }
 
-    private function getRequiredPositions(array $settings, Group $group)
+    private function getRequiredPositions(array $settings, Group $group, ModuleInstance $moduleInstance)
     {
-        return app(RequiredSettingRetrieval::class)->getSettings($group, $settings);
+        return app(RequiredSettingRetrieval::class)->getSettings($group, $settings, $moduleInstance);
     }
 
     private function rolesThroughGroup(Group $group, ModuleInstance $moduleInstance)
