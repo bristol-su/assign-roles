@@ -7,6 +7,7 @@ use BristolSU\ControlDB\Contracts\Repositories\Position;
 use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Facade\LogicTester;
+use BristolSU\Support\ModuleInstance\ModuleInstance;
 use Illuminate\Support\Facades\Cache;
 
 class RequiredSettingRetrieval
@@ -32,23 +33,23 @@ class RequiredSettingRetrieval
         $this->positionRepository = $positionRepository;
     }
 
-    public function getSettings(Group $group, array $settings)
+    public function getSettings(Group $group, array $settings, ModuleInstance $moduleInstance)
     {
-        if(Cache::has($this->getCacheKey($group))) {
-            return Cache::get($this->getCacheKey($group));
+        if(Cache::has($this->getCacheKey($group, $moduleInstance))) {
+            return Cache::get($this->getCacheKey($group, $moduleInstance));
         }
         foreach ((array_key_exists('required', $settings)?$settings['required']:[]) as $setting) {
             if ($this->groupIsForSetting($group, $setting)) {
-                Cache::put($this->getCacheKey($group), $setting['required'], 7200);
+                Cache::put($this->getCacheKey($group, $moduleInstance), $setting['required'], 7200);
                 return $setting['required'];
             }
         }
         throw new SettingRetrievalException('Could not find a setting');
     }
 
-    protected function getCacheKey(Group $group)
+    protected function getCacheKey(Group $group, ModuleInstance $moduleInstance)
     {
-        return RequiredSettingRetrieval::class . '.' . $group->id();
+        return RequiredSettingRetrieval::class . '.' . $moduleInstance->id() . '.' . $group->id();
     }
     
     protected function groupIsForSetting(Group $group, array $setting): bool

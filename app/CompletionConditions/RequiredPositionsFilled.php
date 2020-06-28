@@ -7,19 +7,15 @@ use BristolSU\ControlDB\Contracts\Models\Role;
 use BristolSU\ControlDB\Contracts\Repositories\Position;
 use BristolSU\ControlDB\Contracts\Repositories\Role as RoleRepository;
 use BristolSU\Module\AssignRoles\Fields\RequiredPositions;
-use BristolSU\Module\AssignRoles\Support\LogicRoleRepository;
 use BristolSU\Module\AssignRoles\Support\RequiredSettingRetrieval;
 use BristolSU\Module\AssignRoles\Support\SettingRetrievalException;
 use BristolSU\Support\ActivityInstance\ActivityInstance;
 use BristolSU\Support\Completion\Contracts\CompletionCondition;
-use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\Contracts\ModuleInstance;
 use FormSchema\Generator\Field;
 use FormSchema\Schema\Form;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class RequiredPositionsFilled extends CompletionCondition
 {
@@ -41,20 +37,11 @@ class RequiredPositionsFilled extends CompletionCondition
     public function isComplete($settings, ActivityInstance $activityInstance, ModuleInstance $moduleInstance): bool
     {
         try {
-            Log::info('--- TESTING ---');
             $remainingPositions = $this->positionsStillToFill($settings, $activityInstance, $moduleInstance);
         } catch (SettingRetrievalException $e) {
-            Log::debug(
-              sprintf(
-                'Setting could not be found for activity instance %d and module instance %d',
-                $activityInstance->id,
-                $moduleInstance->id()
-              )
-            );
             return false;
         }
        
-        Log::info('Result is ' . (count($remainingPositions) === 0 ? 'true' : 'false'));
        return count($remainingPositions) === 0;
     }
     
@@ -63,7 +50,7 @@ class RequiredPositionsFilled extends CompletionCondition
         $group = $this->getGroup($activityInstance);
 
         try {
-            $requiredPositions = $this->getRequiredPositions($settings, $group);
+            $requiredPositions = $this->getRequiredPositions($settings, $group, $moduleInstance);
             $remainingPositions = $this->positionsStillToFill($settings, $activityInstance, $moduleInstance);
         } catch (SettingRetrievalException $e) {
             return false;
@@ -86,17 +73,11 @@ class RequiredPositionsFilled extends CompletionCondition
     protected function positionsStillToFill($settings, ActivityInstance $activityInstance, ModuleInstance $moduleInstance)
     {
         $group = $this->getGroup($activityInstance);
-        Log::info('Using group ' . $group->id());
         $roles = $this->rolesThroughGroup($group, $moduleInstance)->filter(function(Role $role) {
             return $role->users()->count() > 0;
         });
         
-        Log::info('Roles to be used: ' . json_encode($roles->map(function($role) {
-            return $role->id();
-          })));
-        
-        Log::info('Required positions ' . (string) collect($this->getRequiredPositions($settings, $group)));
-        return collect($this->getRequiredPositions($settings, $group))->filter(function(int $positionId) use ($roles) {
+        return collect($this->getRequiredPositions($settings, $group, $moduleInstance))->filter(function(int $positionId) use ($roles) {
             return $roles->filter(function(Role $role) use ($positionId) {
                 return $role->positionId() === $positionId;
             })->count() === 0;
@@ -174,28 +155,20 @@ class RequiredPositionsFilled extends CompletionCondition
         return $activityInstance->participant()->group();
     }
 
-    private function getRequiredPositions(array $settings, Group $group)
+    private function getRequiredPositions(array $settings, Group $group, ModuleInstance $moduleInstance)
     {
-        return app(RequiredSettingRetrieval::class)->getSettings($group, $settings);
+        return app(RequiredSettingRetrieval::class)->getSettings($group, $settings, $moduleInstance);
     }
 
     private function rolesThroughGroup(Group $group, ModuleInstance $moduleInstance)
     {
         $roles = $group->roles();
-        Log::info('Roles through group pre logic filtering: ' . json_encode($roles->map(function($role) {
-              return $role->id();
-          })));
         if($this->logicGroupId($moduleInstance) !== null) {
             $logicGroup = app(LogicRepository::class)->getById($this->logicGroupId($moduleInstance));
             return $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($moduleInstance, $logicGroup) {
                 return LogicTester::evaluate($logicGroup, null, $role->group(), $role);
             })->values();
         }
-
-        Log::info('Roles through group post logic filtering: ' . json_encode($roles->map(function($role) {
-              return $role->id();
-          })));
-        
         return $roles;
     }
 

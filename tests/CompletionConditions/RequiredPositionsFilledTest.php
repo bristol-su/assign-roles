@@ -8,6 +8,7 @@ use BristolSU\Module\AssignRoles\CompletionConditions\RequiredPositionsFilled;
 use BristolSU\Module\AssignRoles\Support\RequiredSettingRetrieval;
 use BristolSU\Module\Tests\AssignRoles\TestCase;
 use BristolSU\Support\ActivityInstance\ActivityInstance;
+use BristolSU\Support\ModuleInstance\Contracts\ModuleInstance;
 use Prophecy\Argument;
 
 class RequiredPositionsFilledTest extends TestCase
@@ -42,7 +43,9 @@ class RequiredPositionsFilledTest extends TestCase
         $requiredSettingRetrieval = $this->prophesize(RequiredSettingRetrieval::class);
         $requiredSettingRetrieval->getSettings(Argument::that(function ($arg) use ($group) {
             return $arg instanceof Group && $arg->is($group);
-        }), ['test_settings'])->willReturn($requiredSettings);
+        }), ['test_settings'], Argument::that(function(ModuleInstance $moduleInstance) {
+            return $moduleInstance->is($this->getModuleInstance());
+        }))->willReturn($requiredSettings);
         $this->app->instance(RequiredSettingRetrieval::class, $requiredSettingRetrieval->reveal());
         
         $cc = new RequiredPositionsFilled('mod_alias', new Role);
@@ -81,7 +84,9 @@ class RequiredPositionsFilledTest extends TestCase
         $requiredSettingRetrieval = $this->prophesize(RequiredSettingRetrieval::class);
         $requiredSettingRetrieval->getSettings(Argument::that(function ($arg) use ($group) {
             return $arg instanceof Group && $arg->is($group);
-        }), ['test_settings'])->willReturn($requiredSettings);
+        }), ['test_settings'], Argument::that(function(ModuleInstance $moduleInstance) {
+            return $moduleInstance->is($this->getModuleInstance());
+        }))->willReturn($requiredSettings);
         $this->app->instance(RequiredSettingRetrieval::class, $requiredSettingRetrieval->reveal());
 
         $cc = new RequiredPositionsFilled('mod_alias', new Role);
