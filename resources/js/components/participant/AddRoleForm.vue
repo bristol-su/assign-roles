@@ -28,14 +28,15 @@
 
             <b-form-group
                     id="role-email-group"
-                    label="Generic Role Email"
+                    label="Role Email Address"
                     label-for="role-email"
-                    description="Is there a generic email for this role, e.g. president@society.co.uk?"
+                    description="(Optional) Do you have a generic email address that's not a users email address for this role that we may need to contact?"
             >
                 <b-form-input
                         id="role-email"
                         v-model="email"
                         type="email"
+                        placeholder="president@society.co.uk"
                 ></b-form-input>
             </b-form-group>
 
@@ -106,8 +107,9 @@
                                     return;
                                 }
                                 // Refresh Page:
+                                self.$root.$emit('triggerRefresh');
                                 this.$notify.success('Created the role');
-                                window.location.reload();
+                                this.$bvModal.hide('add-role');
                             })
                             .catch(() => {})
                     })

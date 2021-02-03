@@ -101,7 +101,14 @@
                     .then(response => this.roles = response.data)
                     .catch(error => this.$notify.alert('Could not load the roles: ' + error.message))
                     .then(() => this.loadingRoles = false)
-                    .then(() => { if(this.addRole) { this.$bvModal.show('add-user-' + this.addRole); } });
+                    .then(() => {
+                        if(this.addRole) {
+                            // Open Modal:
+                            this.$bvModal.show('add-user-' + this.addRole);
+                            // Reset Value:
+                            this.addRole = null;
+                        }
+                    });
             },
             loadMembers() {
                 this.$http.get('/members')
@@ -109,6 +116,7 @@
                     .catch(error => this.$notify.alert('Members could not be loaded: ' + error.message));
             },
             deleteRole(roleId) {
+                let self = this;
                 this.$bvModal.msgBoxConfirm('Are you sure you want to remove this role?', {
                     title: 'Please Confirm',
                     size: 'sm',
@@ -125,7 +133,7 @@
                             this.$http.delete('role/' + this.role.id + '/user/' + this.user.id)
                                 .then(response => {
                                     this.$notify.success('User removed from role')
-                                    window.location.reload();
+                                    self.$root.$emit('triggerRefresh');
                                 })
                                 .catch(error => this.$notify.alert('User could not be removed from role: ' + error.message))
                         }

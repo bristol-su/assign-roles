@@ -2110,6 +2110,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "AddRoleForm",
   props: {
@@ -2173,9 +2174,11 @@ __webpack_require__.r(__webpack_exports__);
           } // Refresh Page:
 
 
+          self.$root.$emit('triggerRefresh');
+
           _this.$notify.success('Created the role');
 
-          window.location.reload();
+          _this.$bvModal.hide('add-role');
         })["catch"](function () {});
       })["catch"](function (error) {
         _this.$notify.alert('Could not create the role: ' + error.message);
@@ -2266,12 +2269,13 @@ __webpack_require__.r(__webpack_exports__);
     addUser: function addUser() {
       var _this = this;
 
+      var self = this;
       this.$http.patch('role/' + this.role.id + '/user/' + this.selectedUser).then(function (response) {
         _this.$notify.success('User assigned to role');
 
         _this.$bvModal.hide('add-user-' + _this.role.id);
 
-        window.location.reload();
+        self.$root.$emit('triggerRefresh');
       })["catch"](function (error) {
         return _this.$notify.alert('User could not be assigned to role: ' + error.message);
       });
@@ -2346,6 +2350,7 @@ __webpack_require__.r(__webpack_exports__);
     deleteUser: function deleteUser() {
       var _this = this;
 
+      var self = this;
       this.$bvModal.msgBoxConfirm('Are you sure you want to remove this user?', {
         title: 'Please Confirm',
         size: 'sm',
@@ -2361,7 +2366,7 @@ __webpack_require__.r(__webpack_exports__);
           _this.$http["delete"]('role/' + _this.role.id + '/user/' + _this.user.id).then(function (response) {
             _this.$notify.success('User removed from role');
 
-            window.location.reload();
+            self.$root.$emit('triggerRefresh');
           })["catch"](function (error) {
             return _this.$notify.alert('User could not be removed from role: ' + error.message);
           });
@@ -2407,6 +2412,8 @@ __webpack_require__.r(__webpack_exports__);
     deleteRole: function deleteRole() {
       var _this = this;
 
+      var self = this;
+
       if (this.role.users.length > 0) {
         this.couldNotDeleteBox();
       } else {
@@ -2417,7 +2424,7 @@ __webpack_require__.r(__webpack_exports__);
             _this.$http["delete"]('role/' + _this.role.id).then(function (response) {
               _this.$notify.success('User removed from role');
 
-              window.location.reload();
+              self.$root.$emit('triggerRefresh');
             })["catch"](function (error) {
               return _this.$notify.alert('User could not be removed from role: ' + error.message);
             });
@@ -2530,6 +2537,7 @@ __webpack_require__.r(__webpack_exports__);
     editRole: function editRole() {
       var _this = this;
 
+      var self = this;
       var attributes = {};
 
       if (this.name !== this.role.data.role_name) {
@@ -2543,7 +2551,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$http.patch('/role/' + this.role.id, attributes).then(function (response) {
         _this.$notify.success('Role updated');
 
-        window.location.reload();
+        self.$root.$emit('triggerRefresh');
       })["catch"](function (error) {
         return _this.$notify.alert('Could not update role: ' + error.message);
       });
@@ -2696,7 +2704,11 @@ __webpack_require__.r(__webpack_exports__);
         return _this2.loadingRoles = false;
       }).then(function () {
         if (_this2.addRole) {
-          _this2.$bvModal.show('add-user-' + _this2.addRole);
+          // Open Modal:
+          _this2.$bvModal.show('add-user-' + _this2.addRole); // Reset Value:
+
+
+          _this2.addRole = null;
         }
       });
     },
@@ -2712,6 +2724,7 @@ __webpack_require__.r(__webpack_exports__);
     deleteRole: function deleteRole(roleId) {
       var _this4 = this;
 
+      var self = this;
       this.$bvModal.msgBoxConfirm('Are you sure you want to remove this role?', {
         title: 'Please Confirm',
         size: 'sm',
@@ -2727,7 +2740,7 @@ __webpack_require__.r(__webpack_exports__);
           _this4.$http["delete"]('role/' + _this4.role.id + '/user/' + _this4.user.id).then(function (response) {
             _this4.$notify.success('User removed from role');
 
-            window.location.reload();
+            self.$root.$emit('triggerRefresh');
           })["catch"](function (error) {
             return _this4.$notify.alert('User could not be removed from role: ' + error.message);
           });
@@ -46374,15 +46387,19 @@ var render = function() {
             {
               attrs: {
                 id: "role-email-group",
-                label: "Generic Role Email",
+                label: "Role Email Address",
                 "label-for": "role-email",
                 description:
-                  "Is there a generic email for this role, e.g. president@society.co.uk?"
+                  "(Optional) Do you have a generic email address that's not a users email address for this role that we may need to contact?"
               }
             },
             [
               _c("b-form-input", {
-                attrs: { id: "role-email", type: "email" },
+                attrs: {
+                  id: "role-email",
+                  type: "email",
+                  placeholder: "president@society.co.uk"
+                },
                 model: {
                   value: _vm.email,
                   callback: function($$v) {
@@ -46450,7 +46467,13 @@ var render = function() {
       _vm._v(" "),
       _c(
         "b-modal",
-        { attrs: { id: "add-user-" + _vm.role.id, title: _vm.modalTitle } },
+        {
+          attrs: {
+            id: "add-user-" + _vm.role.id,
+            title: _vm.modalTitle,
+            "hide-footer": ""
+          }
+        },
         [
           _c(
             "b-form-group",
