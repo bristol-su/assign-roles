@@ -69,6 +69,15 @@
             this.loadMembers();
         },
 
+        mounted() {
+            this.$root.$on('triggerRefresh', data => {
+                this.addRole = data;
+                // Update Table Data:
+                this.loadRoles();
+                this.loadMembers();
+            });
+        },
+
         data() {
             return {
                 fields: [
@@ -80,7 +89,8 @@
                 ],
                 roles: [],
                 members: [],
-                loadingRoles: false
+                loadingRoles: false,
+                addRole: null
             }
         },
 
@@ -90,7 +100,8 @@
                 this.$http.get('role')
                     .then(response => this.roles = response.data)
                     .catch(error => this.$notify.alert('Could not load the roles: ' + error.message))
-                    .then(() => this.loadingRoles = false);
+                    .then(() => this.loadingRoles = false)
+                    .then(() => { if(this.addRole) { this.$bvModal.show('add-user-' + this.addRole); } });
             },
             loadMembers() {
                 this.$http.get('/members')
@@ -146,7 +157,7 @@
                     console.log(this.takenUsers);
                     return this.takenUsers.filter(user => user.id === member.id).length === 0;
                 });           
-            },
+            }
         }
     }
 </script>

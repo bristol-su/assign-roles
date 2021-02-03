@@ -39,7 +39,7 @@
                 ></b-form-input>
             </b-form-group>
 
-            <b-button type="submit" variant="primary">Submit</b-button>
+            <b-button type="submit" variant="primary">Add Role</b-button>
         </b-form>
     </div>
 </template>
@@ -80,14 +80,36 @@
                 return 'position #' + positionId;
             },
             createRole() {
+                let self = this;
+
                 this.$http.post('/role', {
                     position_id: this.positionId,
                     role_name: (this.role_name === ''?null:this.role_name),
                     email: (this.email === ''?null:this.email)
                 })
                     .then(response => {
-                        this.$notify.success('Created the role');
-                        window.location.reload();
+                        this.$bvModal.msgBoxConfirm('Would you like to add a user to the role?', {
+                            title: 'Confirmation',
+                            size: 'sm',
+                            buttonSize: 'sm',
+                            okTitle: 'YES',
+                            cancelTitle: 'NO',
+                            footerClass: 'p-2',
+                            hideHeaderClose: true,
+                            centered: true
+                        })
+                            .then(value => {
+                                if(value === true) {
+                                    // Refresh Table and Trigger other Modal:
+                                    self.$root.$emit('triggerRefresh', response.data.id);
+                                    this.$bvModal.hide('add-role');
+                                    return;
+                                }
+                                // Refresh Page:
+                                this.$notify.success('Created the role');
+                                window.location.reload();
+                            })
+                            .catch(() => {})
                     })
                     .catch(error => {
                         this.$notify.alert('Could not create the role: ' + error.message)
