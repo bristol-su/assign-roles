@@ -66,11 +66,10 @@
         },
 
         watch: {
-            positionId(val) {
-                if(this.role_name === null) {
-                    this.role_name = this.getPositionName(val);
-                }
-            }
+            positionId(newVal, oldVal) {
+                // If role name is empty or hasn't been changed then assign Position Name
+                return this.role_name === null || this.role_name === this.getPositionName(oldVal) ? this.role_name = this.getPositionName(newVal) : '';
+            },
         },
 
         methods: {
