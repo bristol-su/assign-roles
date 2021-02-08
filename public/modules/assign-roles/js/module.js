@@ -2129,7 +2129,7 @@ __webpack_require__.r(__webpack_exports__);
   watch: {
     positionId: function positionId(newVal, oldVal) {
       // If role name is empty or hasn't been changed then assign Position Name
-      return this.role_name === null || this.role_name === this.getPositionName(oldVal) ? this.role_name = this.getPositionName(newVal) : '';
+      return !this.role_name || this.role_name === this.getPositionName(oldVal) ? this.role_name = this.getPositionName(newVal) : '';
     }
   },
   methods: {
