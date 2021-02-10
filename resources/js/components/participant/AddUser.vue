@@ -2,7 +2,7 @@
     <div>
         <b-button size="sm" variant="outline-success" v-b-modal="'add-user-' + role.id" v-if="spaceAvailable">Add</b-button>
         
-        <b-modal :id="'add-user-' + role.id" :title="modalTitle">
+        <b-modal :id="'add-user-' + role.id" :title="modalTitle" hide-footer>
             <b-form-group
                     id="user-search-group"
                     description="The user must be a member of your group"
@@ -61,11 +61,12 @@
         
         methods: {
             addUser() {
+                let self = this;
                 this.$http.patch('role/' + this.role.id + '/user/' + this.selectedUser)
                     .then(response => {
                         this.$notify.success('User assigned to role');
                         this.$bvModal.hide('add-user-' + this.role.id);
-                        window.location.reload();
+                        self.$root.$emit('triggerRefresh');
                     })
                     .catch(error => this.$notify.alert('User could not be assigned to role: ' + error.message));
             },

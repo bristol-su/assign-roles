@@ -64,6 +64,7 @@
 
         methods: {
             editRole() {
+                let self = this;
                 let attributes = {};
                 if (this.name !== this.role.data.role_name) {
                     attributes['role_name'] = this.name;
@@ -74,7 +75,7 @@
                 this.$http.patch('/role/' + this.role.id, attributes)
                     .then(response => {
                         this.$notify.success('Role updated');
-                        window.location.reload();
+                        self.$root.$emit('triggerRefresh');
                     })
                     .catch(error => this.$notify.alert('Could not update role: ' + error.message));
             },
