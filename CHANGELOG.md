@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- portal-142: UI fixes for assign roles
+
 ## [1.0.1] - (28/06/2020)
 
 ### Fixed
