@@ -23,6 +23,7 @@
 
         methods: {
             deleteRole() {
+                let self = this;
                 if (this.role.users.length > 0) {
                     this.couldNotDeleteBox();
                 } else {
@@ -33,7 +34,7 @@
                                 this.$http.delete('role/' + this.role.id)
                                     .then(response => {
                                         this.$notify.success('User removed from role')
-                                        window.location.reload();
+                                        self.$root.$emit('triggerRefresh');
                                     })
                                     .catch(error => this.$notify.alert('User could not be removed from role: ' + error.message))
                             }
