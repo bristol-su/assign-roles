@@ -25,6 +25,7 @@
 
         methods: {
             deleteUser() {
+                let self = this;
                 this.$bvModal.msgBoxConfirm('Are you sure you want to remove this user?', {
                     title: 'Please Confirm',
                     size: 'sm',
@@ -41,7 +42,7 @@
                             this.$http.delete('role/' + this.role.id + '/user/' + this.user.id)
                                 .then(response => {
                                     this.$notify.success('User removed from role')
-                                    window.location.reload();
+                                    self.$root.$emit('triggerRefresh');
                                 })
                                 .catch(error => this.$notify.alert('User could not be removed from role: ' + error.message))
                         }
