@@ -14,5 +14,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([\BristolSU\Module\AssignRoles\Http\Middleware\BindRoleRepository::class])->group(function() {
-    Route::get('/', 'ParticipantPageController@index');
+    Route::get('/', [\BristolSU\Module\AssignRoles\Http\Controllers\ParticipantPageController::class, 'index']);
 });

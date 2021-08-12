@@ -30,7 +30,7 @@ class ModuleServiceProvider extends ServiceProvider
             'description' => 'View the administrator page of the module.',
             'admin' => true
         ],
-        
+
         'assign' => [
             'name' => 'Assign a Role',
             'description' => 'Assign a role to a member of the group',
@@ -46,7 +46,7 @@ class ModuleServiceProvider extends ServiceProvider
             'description' => 'See a list of members that can be assigned roles',
             'admin' => false
         ],
-        
+
         'role.index' => [
             'name' => 'See all roles',
             'description' => 'See a list of all existing roles for their group',
@@ -67,8 +67,8 @@ class ModuleServiceProvider extends ServiceProvider
             'description' => 'Change the name and email of an existing role',
             'admin' => false
         ],
-        
-        
+
+
     ];
 
     protected $events = [
@@ -93,7 +93,7 @@ class ModuleServiceProvider extends ServiceProvider
 
     public function namespace()
     {
-        return '\BristolSU\Module\AssignRoles\Http\Controllers';
+        return null;
     }
 
     public function baseDirectory()
@@ -105,7 +105,7 @@ class ModuleServiceProvider extends ServiceProvider
     {
         parent::boot();
         $this->registerGlobalScript('modules/assign-roles/js/components.js');
-        
+
         app(CompletionConditionManager::class)->register('assign-roles', 'required_positions_are_filled', RequiredPositionsFilled::class);
     }
 
