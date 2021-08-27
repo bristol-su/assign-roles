@@ -7,11 +7,9 @@ use FormSchema\Schema\Field;
 class RequiredPositions extends Field
 {
 
-    protected $type = 'assignRolesRequiredPositions';
+    protected array $logic = [];
 
-    protected $logic;
-
-    protected $positions;
+    protected array $positions = [];
 
     /**
      * @inheritDoc
@@ -19,8 +17,34 @@ class RequiredPositions extends Field
     public function getAppendedAttributes(): array
     {
         return [
-            'logic' => ($this->logic() ?? []),
-            'positions' => ($this->positions() ?? [])
+            'logic' => $this->logic,
+            'positions' => $this->positions
         ];
     }
+
+    public function getType(): string
+    {
+        return 'assignRolesRequiredPositions';
+    }
+
+    /**
+     * @param array $logic
+     * @return RequiredPositions
+     */
+    public function setLogic(array $logic): RequiredPositions
+    {
+        $this->logic = $logic;
+        return $this;
+    }
+
+    /**
+     * @param array $positions
+     * @return RequiredPositions
+     */
+    public function setPositions(array $positions): RequiredPositions
+    {
+        $this->positions = $positions;
+        return $this;
+    }
+
 }

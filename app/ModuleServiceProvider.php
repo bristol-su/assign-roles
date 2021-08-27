@@ -14,6 +14,7 @@ use BristolSU\Support\Module\ModuleServiceProvider as ServiceProvider;
 use FormSchema\Generator\Field;
 use FormSchema\Generator\Group;
 use FormSchema\Schema\Form;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
 class ModuleServiceProvider extends ServiceProvider
@@ -121,40 +122,40 @@ class ModuleServiceProvider extends ServiceProvider
     {
         return \FormSchema\Generator\Form::make()->withGroup(
             Group::make('Page Layout')->withField(
-                Field::input('title')->inputType('text')->label('Title')->featured(false)->required(true)
-                    ->default('Page Title')->hint('The title of the page')
-                    ->help('This title will be shown at the top of the page, to help users understand what the module is for')
+                Field::textInput('title')->setLabel('Title')->setRequired(true)
+                    ->setValue('Page Title')->setHint('The title of the page')
+                    ->setTooltip('This title will be shown at the top of the page, to $this->setTooltip() users understand what the module is for')
             )->withField(
-                Field::input('subtitle')->inputType('text')->label('Subtitle')->featured(false)->required(true)
-                    ->default('Page Subtitle')->hint('The subtitle for the page')
-                    ->help('This subtitle will be shown under the title, and should include more information for users')
+                Field::textInput('subtitle')->setLabel('Subtitle')->setRequired(true)
+                    ->setValue('Page Subtitle')->setHint('The subtitle for the page')
+                    ->setTooltip('This subtitle will be shown under the title, and should include more information for users')
             )->withField(
-                Field::input('no_settings')->inputType('text')->label('No Settings Text')->featured(false)->required(true)
-                    ->default('No position settings found')->hint('Text to show if no position settings are found for the group')
-                    ->help('If no position settings are found matching the group, an error page will be loaded. Use this text to explain what went wrong and how the user can fix it.')
+                Field::textInput('no_settings')->setLabel('No Settings Text')->setRequired(true)
+                    ->setValue('No position settings found')->setHint('Text to show if no position settings are found for the group')
+                    ->setTooltip('If no position settings are found matching the group, an error page will be loaded. Use this text to explain what went wrong and how the user can fix it.')
             )
         )->withGroup(
             Group::make()->withField(
                 Field::make(PositionSettings::class, 'position_settings')
-                    ->label('Position Settings')->featured(true)->required(true)
-                    ->default([])->hint('Define which positions can be assigned to whom')
-                    ->help('Define the positions that may be used, positions which may only be held by one person and positions for which the assignee is not allowed any other positions')
-                    ->logic($this->getLogic())
-                    ->positions($this->getPositions())
+                    ->setLabel('Position Settings')->setRequired(true)
+                    ->setValue([])->setHint('Define which positions can be assigned to whom')
+                    ->setTooltip('Define the positions that may be used, positions which may only be held by one person and positions for which the assignee is not allowed any other positions')
+                    ->setLogic($this->getLogic()->toArray())
+                    ->setPositions($this->getPositions()->toArray())
             )->withField(
-                Field::select('logic_group')->label('Logic Group to show')
-                    ->featured(false)->required(false)->default(null)
-                    ->hint('The logic group to show the roles from')
-                    ->help('The logic group the roles should be in. If given, only roles in this logic group will be shown.')
-                    ->values($this->getLogic()->map(function(Logic $logic) {
-                        return ['id' => $logic->id, 'name' => $logic->name];
-                    }))
-                    ->selectOptions(['noneSelectedText' => '-- Show all roles --', 'hideNoneSelectedText' => false])
+                Field::select('logic_group')->setLabel('Logic Group to show')
+                    ->setRequired(false)->setValue(null)
+                    ->setHint('The logic group to show the roles from')
+                    ->setTooltip('The logic group the roles should be in. If given, only roles in this logic group will be shown.')
+                    ->setSelectOptions($this->getLogic()->map(function(Logic $logic) {
+                        return ['id' => $logic->id, 'value' => $logic->name];
+                    })->toArray())
+                    ->withNullOption('-- Show all roles --', null)
             )
         )->getSchema();
     }
 
-    private function getLogic()
+    private function getLogic(): Collection
     {
         try {
             return collect(app(LogicRepository::class)->all());
@@ -163,7 +164,7 @@ class ModuleServiceProvider extends ServiceProvider
         }
     }
 
-    private function getPositions()
+    private function getPositions(): Collection
     {
         try {
             return collect(app(Position::class)->all());
