@@ -1,14 +1,14 @@
 <template>
     <div>
-        <position-select :positions="positions" v-model="required" checkbox-name="required"></position-select>
+        <p-dynamic-form v-model="required" :schema="form">
+
+        </p-dynamic-form>
     </div>
 </template>
 
 <script>
-    import PositionSelect from './PositionSelect';
     export default {
-        name: "PositionSetting",
-        components: {PositionSelect},
+        name: "RequiredPosition",
         props: {
             positions: {
                 type: Array,
@@ -32,7 +32,7 @@
 
         data() {
             return {
-                required: [],
+                required: {},
             }
         },
 
@@ -43,7 +43,7 @@
                 }
             }
          },
-        
+
         watch: {
             required: {
                 deep: true,
@@ -52,15 +52,32 @@
                 }
             },
         },
-        
+
         methods: {
             updateValues() {
                 this.$emit('input', {
                     logic_id: this.logicId,
-                    required: this.required
+                    required: this.required.required
                 })
             }
         },
+        computed: {
+            form() {
+                return this.$tools.generator.form.newForm()
+                    .withGroup(this.$tools.generator.group.newGroup()
+                        .withField(this.$tools.generator.field.checkList('required')
+                            .value([])
+                            .label('Required Positions')
+                            .hint('These positions need to be filled to mark the module as complete')
+                            .setOptions(this.positions.map(position => {
+                                return {id: position.id, text: position.data.name}
+                            }))
+                        )
+                    )
+                    .generate()
+                    .asJson()
+            }
+        }
     }
 </script>
 

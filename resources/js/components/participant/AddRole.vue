@@ -1,68 +1,121 @@
 <template>
     <div>
-        <div style="text-align: right;" v-if="positions.length > 0">
-            <b-button size="lg" variant="outline-info" v-b-modal.add-role>Add Role</b-button>
-        </div>
-        
-        <b-modal id="add-role" ok-only ok-title="Cancel" ok-variant="danger">
-            <add-role-form :positions="positions">
-                
-            </add-role-form>
-        </b-modal>
+        <p-form-padding>
+            <p-dynamic-form :schema="form" v-model="formData">
+            </p-dynamic-form>
+
+            <p-button variant="primary" @click="createRole">
+                Add Role
+            </p-button>
+        </p-form-padding>
     </div>
 </template>
 
 <script>
-    import AddRoleForm from './AddRoleForm';
-    export default {
-        name: "AddRole",
-        components: {AddRoleForm},
-        props: {
-            allowed: {
-                type: Array,
-                required: false,
-                default: function() {
-                    return [];
-                }
-            },
-            onlyOneRole: {
-                type: Array,
-                required: false,
-                default: function() {
-                    return [];
-                }
-            }
-        },
-        
-        data() {
-            return {
-                roles: []
-            }
-        },
+import ProvidesUsers from './ProvidesUsers';
 
-        created() {
-            this.$http.get('role')
-                .then(response => this.roles = response.data)
-                .catch(error => this.$notify.alert('Could not load roles: ' + error.message));
+export default {
+    name: "AddRole",
+    mixins: [ProvidesUsers],
+    props: {
+        positions: {
+            required: true,
+            type: Array
         },
-        
-        methods: {
-            positionIsAvailable(position) {
-                if(this.onlyOneRole.filter(p => p.id === position.id).length > 0) {
-                    if(this.roles.filter(role => role.position_id === position.id).length > 0) {
-                        return false;
+        onlyOneUser: {
+            required: true,
+            type: Array
+        }
+    },
+
+    data() {
+        return {
+            formData: {}
+        }
+    },
+
+    methods: {
+        getPositionName(positionId) {
+            if (this.positions.filter(p => p.id === positionId).length > 0) {
+                return this.positions.filter(p => p.id === positionId)[0].data.name;
+            }
+            return 'position #' + positionId;
+        },
+        createRole() {
+            this.$http.post('/role', {
+                position_id: this.formData.position_id,
+                role_name: (this.formData.role_name ? this.formData.role_name : this.getPositionName(this.formData.position_id)),
+                email: this.formData.role_email ? this.formData.role_email : null
+            })
+                .then(response => {
+                    this.$notify.success('Role created');
+                    this.$emit('add-role', response.data);
+                    if(this.formData.members) {
+                        (Array.isArray(this.formData.members) ? this.formData.members : [this.formData.members]).forEach(memberId => {
+                            this.$http.patch('role/' + response.data.id + '/user/' + memberId)
+                                .then(response => {
+
+                                })
+                                .catch(error => this.$notify.alert('User could not be assigned to role: ' + error.message));
+                        })
                     }
-                }
-                return true;
-            },
-        },
+                })
+                .catch(error => {
+                    this.$notify.alert('Could not create the role: ' + error.message)
+                });
+        }
+    },
 
-        computed: {
-            positions() {
-                return this.allowed.filter(position => this.positionIsAvailable(position));
+    computed: {
+        positionOptions() {
+            return this.positions.map(position => {
+                return {id: position.id, value: position.data.name}
+            })
+        },
+        form() {
+            return this.$tools.generator.form.newForm('Add a Role')
+                .withGroup(this.$tools.generator.group.newGroup()
+                    .withField(
+                        this.$tools.generator.field.select('position_id')
+                            .label('Position Type')
+                            .hint('What type of role is this?')
+                            .setOptions(this.positionOptions)
+                            .nullLabel('-- Please select an option --', null)
+                            .required(true)
+                    )
+                    .withField(
+                        this.$tools.generator.field.text('role_name')
+                            .label('Role Title')
+                            .hint('What should the role be called? e.g. President')
+                            .required(false)
+                    )
+                    .withField(
+                        this.$tools.generator.field.text('role_email')
+                            .label('Role Email Address')
+                            .hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?')
+                            .required(false)
+                    )
+                    .withField(
+                        this.$tools.generator.field.select('members')
+                            .label('Members')
+                            .hint('Who should have this role?')
+                            .setOptions(this.memberOptions)
+                            .nullLabel('-- Please select a society member --', null)
+                            .required(false)
+                            .multiple(!this.formData.position_id || this.onlyOneUser.filter(o => o.id === this.formData.position_id).length === 0)
+                            .value([])
+                    )
+                )
+        },
+        position() {
+            if(this.formData.position_id) {
+                let position = this.positions.filter(p => p.id === this.formData.position_id);
+                return (position ? position[0] : position)
             }
+            return null;
         }
     }
+}
 </script>
 
 <style scoped>

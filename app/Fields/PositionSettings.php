@@ -24,7 +24,7 @@ class PositionSettings extends Field
 
     public function getType(): string
     {
-        return 'assignRolesPositionSettings';
+        return 'p-assign-roles-position-settings';
     }
 
     /**

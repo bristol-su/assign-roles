@@ -24,7 +24,7 @@ class RequiredPositions extends Field
 
     public function getType(): string
     {
-        return 'assignRolesRequiredPositions';
+        return 'p-assign-roles-required-positions';
     }
 
     /**
