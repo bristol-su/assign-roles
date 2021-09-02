@@ -176,7 +176,7 @@ __webpack_require__.r(__webpack_exports__);
     form: function form() {
       var _this2 = this;
 
-      return this.$tools.generator.form.newForm('Add a Role').withGroup(this.$tools.generator.group.newGroup().withField(this.$tools.generator.field.select('position_id').label('Position Type').hint('What type of role is this?').setOptions(this.positionOptions).nullLabel('-- Please select an option --', null).required(true)).withField(this.$tools.generator.field.text('role_name').label('Role Title').hint('What should the role be called? e.g. President').required(false)).withField(this.$tools.generator.field.text('role_email').label('Role Email Address').hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?').required(false)).withField(this.$tools.generator.field.select('members').label('Members').hint('Who should have this role?').setOptions(this.memberOptions).nullLabel('-- Please select a society member --', null).required(false).multiple(!this.formData.position_id || this.onlyOneUser.filter(function (o) {
+      return this.$tools.generator.form.newForm('Add a Role').withGroup(this.$tools.generator.group.newGroup().withField(this.$tools.generator.field.select('position_id').label('Position Type').hint('What type of role is this?').setOptions(this.positionOptions).nullLabel('-- Please select an option --', null).required(true)).withField(this.$tools.generator.field.text('role_name').label('Role Title').hint('What should the role be called? e.g. President').required(false)).withField(this.$tools.generator.field.text('role_email').label('Role Email Address').tooltip('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?').hint('(Optional)').required(false)).withField(this.$tools.generator.field.select('members').label('Members').tooltip('Who should we assign this role to?').hint('(Optional)').setOptions(this.memberOptions).nullLabel('-- Please select a society member --', null).required(false).multiple(!this.formData.position_id || this.onlyOneUser.filter(function (o) {
         return o.id === _this2.formData.position_id;
       }).length === 0).value([])));
     },
@@ -440,8 +440,15 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   computed: {
+    roleData: function roleData() {
+      return {
+        name: this.role.data.role_name,
+        email: this.role.data.email
+      };
+    },
     form: function form() {
-      return this.$tools.generator.form.newForm('Add a Role').withGroup(this.$tools.generator.group.newGroup().withField(this.$tools.generator.field.text('role_name').label('Role Title').hint('What should the role be called? e.g. President').required(false).value(this.role.data.role_name)).withField(this.$tools.generator.field.text('role_email').label('Role Email Address').hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?').required(false).value(this.role.data.email)));
+      var role = this.roleData;
+      return this.$tools.generator.form.newForm('Edit a Role').withGroup(this.$tools.generator.group.newGroup().withField(this.$tools.generator.field.text('role_name').label('Role Title').hint('What should the role be called? e.g. President').required(false).value(role.name)).withField(this.$tools.generator.field.text('role_email').label('Role Email Address').hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?').required(false).value(role.email))).generate().asJson();
     }
   }
 });
@@ -638,6 +645,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -717,7 +726,7 @@ __webpack_require__.r(__webpack_exports__);
       this.roles.splice(this.roles.indexOf(this.roles.filter(function (r) {
         return r.id === role.id;
       })[0]), 1, role);
-      this.roleBeingEdited = false;
+      this.roleBeingEdited = null;
       this.$refs.tabs.selectTab(0);
     },
     addRole: function addRole(role) {
@@ -732,7 +741,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     editRole: function editRole(role) {
       this.roleBeingEdited = role;
-      this.$refs.tabs.selectTab(1);
+      this.$refs.tabs.selectTab(2);
     }
   },
   computed: {
@@ -18043,7 +18052,10 @@ var render = function() {
                 }
               }
             },
-            [_c("i", { staticClass: "fa fa-plus" }), _vm._v(" Add Role\n    ")]
+            [
+              _c("i", { staticClass: "fa fa-plus" }),
+              _vm._v(" Add User to Role\n    ")
+            ]
           )
         : _vm._e(),
       _vm._v(" "),
@@ -18078,7 +18090,7 @@ var render = function() {
             ? _c(
                 "p-button",
                 { attrs: { variant: "primary" }, on: { click: _vm.addUser } },
-                [_vm._v("\n            Add Role\n        ")]
+                [_vm._v("\n            Add User to Role\n        ")]
               )
             : _vm._e()
         ],
@@ -18305,24 +18317,33 @@ var render = function() {
                 "p-tab",
                 { attrs: { title: "Add Role" } },
                 [
-                  _vm.roleBeingEdited
-                    ? _c("edit-role", {
-                        attrs: {
-                          role: _vm.roleBeingEdited,
-                          positions: _vm.positions
-                        },
-                        on: { "updated-role": _vm.updateRole }
-                      })
-                    : _c("add-role", {
-                        attrs: {
-                          positions: _vm.positions,
-                          members: _vm.members,
-                          roles: _vm.orderedRoles,
-                          "user-only-has-one-role": _vm.userOnlyHasOneRole,
-                          "only-one-user": _vm.onlyOneUser
-                        },
-                        on: { "add-role": _vm.addRole }
-                      })
+                  _c("add-role", {
+                    attrs: {
+                      positions: _vm.positions,
+                      members: _vm.members,
+                      roles: _vm.orderedRoles,
+                      "user-only-has-one-role": _vm.userOnlyHasOneRole,
+                      "only-one-user": _vm.onlyOneUser
+                    },
+                    on: { "add-role": _vm.addRole }
+                  })
+                ],
+                1
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.roleBeingEdited
+            ? _c(
+                "p-tab",
+                { attrs: { title: "Edit Role" } },
+                [
+                  _c("edit-role", {
+                    attrs: {
+                      role: _vm.roleBeingEdited,
+                      positions: _vm.positions
+                    },
+                    on: { "updated-role": _vm.updateRole }
+                  })
                 ],
                 1
               )
@@ -19057,8 +19078,8 @@ var vue = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /mnt/5F242F4A45A0248A/development/bristolsu/portal/portal-sites/playground/repos/bristol-su/assign-roles/resources/js/module.js */"./resources/js/module.js");
-module.exports = __webpack_require__(/*! /mnt/5F242F4A45A0248A/development/bristolsu/portal/portal-sites/playground/repos/bristol-su/assign-roles/resources/sass/module.scss */"./resources/sass/module.scss");
+__webpack_require__(/*! /Users/aidanlaycock/Desktop/ElbowSpace/Portal/portal-ui-dev/repos/assign-roles/resources/js/module.js */"./resources/js/module.js");
+module.exports = __webpack_require__(/*! /Users/aidanlaycock/Desktop/ElbowSpace/Portal/portal-ui-dev/repos/assign-roles/resources/sass/module.scss */"./resources/sass/module.scss");
 
 
 /***/ }),
