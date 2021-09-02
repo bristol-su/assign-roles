@@ -19,8 +19,9 @@
 
                 </add-role>
             </p-tab>
-            <p-tab title="Edit Role" v-if="roleBeingEdited">
-                <edit-role :role="roleBeingEdited" @updated-role="updateRole" :positions="positions"></edit-role>
+            <p-tab title="Edit Role">
+                <p v-if="! roleBeingEdited">Please select a role to edit.</p>
+                <edit-role v-else :role="roleBeingEdited" @updated-role="updateRole" :positions="positions"></edit-role>
             </p-tab>
         </p-tabs>
 
