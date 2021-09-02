@@ -57,6 +57,11 @@ export default {
                 });
         }
     },
+    watch: {
+        role() {
+            this.formData = {};
+        }
+    },
     computed: {
         roleData()
         {
