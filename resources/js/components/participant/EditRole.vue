@@ -57,26 +57,35 @@ export default {
                 });
         }
     },
-
     computed: {
+        roleData()
+        {
+            return {
+                name: this.role.data.role_name,
+                email: this.role.data.email
+            };
+        },
         form() {
-            return this.$tools.generator.form.newForm('Add a Role')
+            let role = this.roleData;
+
+            return this.$tools.generator.form.newForm('Edit a Role')
                 .withGroup(this.$tools.generator.group.newGroup()
                     .withField(
                         this.$tools.generator.field.text('role_name')
                             .label('Role Title')
                             .hint('What should the role be called? e.g. President')
                             .required(false)
-                            .value(this.role.data.role_name)
+                            .value(role.name)
                     )
                     .withField(
                         this.$tools.generator.field.text('role_email')
                             .label('Role Email Address')
                             .hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?')
                             .required(false)
-                            .value(this.role.data.email)
+                            .value(role.email)
                     )
-                )
+                ).generate()
+                .asJson();
         }
     }
 }

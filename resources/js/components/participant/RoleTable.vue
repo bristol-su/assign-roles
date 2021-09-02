@@ -3,8 +3,8 @@
         <p-table :columns="fields" :items="roles"
                  :deletable="true"
                  @delete="deleteRow"
-                :editable="true"
-                @edit="$emit('edit-role', $event)">
+                 :editable="true"
+                 @edit="$emit('edit-role', $event)">
             <template v-slot:cell(assigned)="{row}">
                 <assigned-users :users="row.users" :role="row" @user-deleted="userWasRemoved(row, $event)"></assigned-users>
                 <add-user :members="members" :role="row"

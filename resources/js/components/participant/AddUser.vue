@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-if="spaceAvailable" @click="$ui.modal.show('add-user-' + role.id)">
-            <i class="fa fa-plus"/> Add Role
+            <i class="fa fa-plus"/> Add User to Role
         </button>
 
         <p-modal :id="'add-user-' + role.id" :title="modalTitle">
@@ -16,7 +16,7 @@
             </p-dynamic-form>
 
             <p-button variant="primary" @click="addUser" v-if="formData.user_id !== null">
-                Add Role
+                Add User to Role
             </p-button>
         </p-modal>
     </div>

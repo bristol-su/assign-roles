@@ -92,13 +92,15 @@ export default {
                     .withField(
                         this.$tools.generator.field.text('role_email')
                             .label('Role Email Address')
-                            .hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?')
+                            .tooltip('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?')
+                            .hint('(Optional)')
                             .required(false)
                     )
                     .withField(
                         this.$tools.generator.field.select('members')
                             .label('Members')
-                            .hint('Who should have this role?')
+                            .tooltip('Who should we assign this role to?')
+                            .hint('(Optional)')
                             .setOptions(this.memberOptions)
                             .nullLabel('-- Please select a society member --', null)
                             .required(false)
