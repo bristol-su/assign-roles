@@ -439,6 +439,11 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   },
+  watch: {
+    role: function role() {
+      this.formData = {};
+    }
+  },
   computed: {
     roleData: function roleData() {
       return {
@@ -618,6 +623,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AddRole__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AddRole */ "./resources/js/components/participant/AddRole.vue");
 /* harmony import */ var _EditRole__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./EditRole */ "./resources/js/components/participant/EditRole.vue");
 /* harmony import */ var _RoleTable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./RoleTable */ "./resources/js/components/participant/RoleTable.vue");
+//
 //
 //
 //
@@ -18332,22 +18338,22 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          _vm.roleBeingEdited
-            ? _c(
-                "p-tab",
-                { attrs: { title: "Edit Role" } },
-                [
-                  _c("edit-role", {
+          _c(
+            "p-tab",
+            { attrs: { title: "Edit Role" } },
+            [
+              !_vm.roleBeingEdited
+                ? _c("p", [_vm._v("Please select a role to edit.")])
+                : _c("edit-role", {
                     attrs: {
                       role: _vm.roleBeingEdited,
                       positions: _vm.positions
                     },
                     on: { "updated-role": _vm.updateRole }
                   })
-                ],
-                1
-              )
-            : _vm._e()
+            ],
+            1
+          )
         ],
         1
       )
