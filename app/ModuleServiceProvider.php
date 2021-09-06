@@ -140,7 +140,9 @@ class ModuleServiceProvider extends ServiceProvider
                     ->setLabel('Position Settings')->setRequired(true)
                     ->setValue([])->setHint('Define which positions can be assigned to whom')
                     ->setTooltip('Define the positions that may be used, positions which may only be held by one person and positions for which the assignee is not allowed any other positions')
-                    ->setLogic($this->getLogic()->toArray())
+                    ->setLogic($this->getLogic()->map(function(Logic $logic) {
+                        return ['id' => $logic->id, 'name' => $logic->name];
+                    })->toArray())
                     ->setPositions($this->getPositions()->toArray())
             )->withField(
                 Field::select('logic_group')->setLabel('Logic Group to show')
