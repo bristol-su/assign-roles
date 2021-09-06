@@ -310,7 +310,7 @@ __webpack_require__.r(__webpack_exports__);
         id: {type: String, required: true},
         label: {validator: (val) => val === null || typeof val === 'string', required: false},
         required: {type: Boolean, required: false},
-        visible: {type: Boolean, required: false},
+        visible: {type: Boolean, required: false, default: true},
         hint: {validator: (val) => val === null || typeof val === 'string', required: false},
         tooltip: {validator: (val) => val === null || typeof val === 'string', required: false},
         value: {required: false, default: null}
@@ -1785,7 +1785,7 @@ vue__WEBPACK_IMPORTED_MODULE_3___default.a.component('p-assign-roles-required-po
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Users/aidanlaycock/Desktop/ElbowSpace/Portal/portal-ui-dev/repos/assign-roles/resources/js/form-settings/components.js */"./resources/js/form-settings/components.js");
+module.exports = __webpack_require__(/*! /mnt/5F242F4A45A0248A/development/bristolsu/portal/portal-sites/playground/repos/bristol-su/assign-roles/resources/js/form-settings/components.js */"./resources/js/form-settings/components.js");
 
 
 /***/ }),

@@ -19084,8 +19084,8 @@ var vue = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/aidanlaycock/Desktop/ElbowSpace/Portal/portal-ui-dev/repos/assign-roles/resources/js/module.js */"./resources/js/module.js");
-module.exports = __webpack_require__(/*! /Users/aidanlaycock/Desktop/ElbowSpace/Portal/portal-ui-dev/repos/assign-roles/resources/sass/module.scss */"./resources/sass/module.scss");
+__webpack_require__(/*! /mnt/5F242F4A45A0248A/development/bristolsu/portal/portal-sites/playground/repos/bristol-su/assign-roles/resources/js/module.js */"./resources/js/module.js");
+module.exports = __webpack_require__(/*! /mnt/5F242F4A45A0248A/development/bristolsu/portal/portal-sites/playground/repos/bristol-su/assign-roles/resources/sass/module.scss */"./resources/sass/module.scss");
 
 
 /***/ }),
