@@ -14,11 +14,14 @@
                     @edit-role="editRole"></role-table>
             </p-tab>
             <p-tab title="Add Role" v-if="positions.length > 0">
-                <edit-role v-if="roleBeingEdited" :role="roleBeingEdited" @updated-role="updateRole" :positions="positions"></edit-role>
                 <add-role :positions="positions" :members="members" :roles="orderedRoles" :user-only-has-one-role="userOnlyHasOneRole" :only-one-user="onlyOneUser"
-                          @add-role="addRole" v-else>
+                          @add-role="addRole">
 
                 </add-role>
+            </p-tab>
+            <p-tab title="Edit Role">
+                <p v-if="! roleBeingEdited">Please select a role to edit.</p>
+                <edit-role v-else :role="roleBeingEdited" @updated-role="updateRole" :positions="positions"></edit-role>
             </p-tab>
         </p-tabs>
 
@@ -93,7 +96,7 @@ export default {
         },
         updateRole(role) {
             this.roles.splice(this.roles.indexOf(this.roles.filter(r => r.id === role.id)[0]), 1, role);
-            this.roleBeingEdited = false;
+            this.roleBeingEdited = null;
             this.$refs.tabs.selectTab(0)
         },
         addRole(role) {
@@ -106,7 +109,7 @@ export default {
         },
         editRole(role) {
             this.roleBeingEdited = role;
-            this.$refs.tabs.selectTab(1);
+            this.$refs.tabs.selectTab(2);
         }
     },
 
