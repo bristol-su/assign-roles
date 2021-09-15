@@ -42,27 +42,31 @@ export default {
             return 'position #' + positionId;
         },
         createRole() {
+            let formData = _.cloneDeep(this.formData);
             this.$http.post('/role', {
-                position_id: this.formData.position_id,
-                role_name: (this.formData.role_name ? this.formData.role_name : this.getPositionName(this.formData.position_id)),
-                email: this.formData.role_email ? this.formData.role_email : null
+                position_id: formData.position_id,
+                role_name: (formData.role_name ? formData.role_name : this.getPositionName(formData.position_id)),
+                email: formData.role_email ? formData.role_email : null
             })
                 .then(response => {
                     this.$notify.success('Role created');
                     this.$emit('add-role', response.data);
-                    if(this.formData.members) {
-                        (Array.isArray(this.formData.members) ? this.formData.members : [this.formData.members]).forEach(memberId => {
-                            this.$http.patch('role/' + response.data.id + '/user/' + memberId)
-                                .then(response => {
+                    if(formData.members) {
+                        (Array.isArray(formData.members) ? formData.members : [formData.members]).forEach(memberId => {
+                            if(memberId !== null) {
+                                this.$http.patch('role/' + response.data.id + '/user/' + memberId)
+                                    .then(response => {
 
-                                })
-                                .catch(error => this.$notify.alert('User could not be assigned to role: ' + error.message));
+                                    })
+                                    .catch(error => this.$notify.alert('User could not be assigned to role: ' + error.message));
+                            }
                         })
                     }
+                    this.formData = {};
                 })
                 .catch(error => {
                     this.$notify.alert('Could not create the role: ' + error.message)
-                });
+                })
         }
     },
 

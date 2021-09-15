@@ -1,13 +1,8 @@
 <template>
     <div>
-        <p-form-padding>
-            <p-dynamic-form :schema="form" v-model="formData">
-            </p-dynamic-form>
+        <p-api-form :schema="form" ref="form" @submit="updateRole" button-text="Update Role">
 
-            <p-button variant="primary" @click="createRole">
-                Update Role
-            </p-button>
-        </p-form-padding>
+        </p-api-form>
     </div>
 </template>
 
@@ -27,12 +22,6 @@ export default {
         }
     },
 
-    data() {
-        return {
-            formData: {}
-        }
-    },
-
     methods: {
         getPositionName(positionId) {
             if (this.positions.filter(p => p.id === positionId).length > 0) {
@@ -40,16 +29,20 @@ export default {
             }
             return 'position #' + positionId;
         },
-        createRole() {
-            this.$http.patch('/role/' + this.role.id, {
-                position_id: this.formData.position_id,
-                role_name: (this.formData.role_name ? this.formData.role_name : this.getPositionName(this.formData.position_id)),
-                email: this.formData.role_email ? this.formData.role_email : null
-            })
+        updateRole(formData) {
+            let data = {};
+            if(formData.hasOwnProperty('edit_role_email')) {
+                data.email = formData.edit_role_email;
+            }
+            if(formData.hasOwnProperty('edit_role_name')) {
+                data.role_name = formData.edit_role_name;
+            }
+            this.$http.patch('/role/' + this.role.id, data)
                 .then(response => {
                     this.$notify.success('Role updated');
                     let role = _.cloneDeep(this.role);
                     role.data = response.data;
+                    this.$refs.form.reset();
                     this.$emit('updated-role', role);
                 })
                 .catch(error => {
@@ -76,18 +69,20 @@ export default {
             return this.$tools.generator.form.newForm('Edit a Role')
                 .withGroup(this.$tools.generator.group.newGroup()
                     .withField(
-                        this.$tools.generator.field.text('role_name')
+                        this.$tools.generator.field.text('edit_role_name')
                             .label('Role Title')
                             .hint('What should the role be called? e.g. President')
                             .required(false)
                             .value(role.name)
+                            .errorKey('role_name')
                     )
                     .withField(
-                        this.$tools.generator.field.text('role_email')
+                        this.$tools.generator.field.text('edit_role_email')
                             .label('Role Email Address')
                             .hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?')
                             .required(false)
                             .value(role.email)
+                            .errorKey('email')
                     )
                 ).generate()
                 .asJson();

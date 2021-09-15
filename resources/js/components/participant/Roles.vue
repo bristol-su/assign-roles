@@ -13,18 +13,18 @@
                     :members="members"
                     @edit-role="editRole"></role-table>
             </p-tab>
-            <p-tab title="Add Role" v-if="positions.length > 0">
+            <p-tab title="Add Role" v-if="positionCount > 0">
                 <add-role :positions="positions" :members="members" :roles="orderedRoles" :user-only-has-one-role="userOnlyHasOneRole" :only-one-user="onlyOneUser"
                           @add-role="addRole">
 
                 </add-role>
             </p-tab>
-            <p-tab title="Edit Role">
-                <p v-if="! roleBeingEdited">Please select a role to edit.</p>
-                <edit-role v-else :role="roleBeingEdited" @updated-role="updateRole" :positions="positions"></edit-role>
-            </p-tab>
         </p-tabs>
 
+        <p-modal id="edit-role" title="Edit Role">
+            <edit-role :role="roleBeingEdited" @updated-role="updateRole" :positions="positions" v-if="roleBeingEdited"></edit-role>
+            <span v-else>Please select a role to edit</span>
+        </p-modal>
     </div>
 </template>
 
@@ -75,6 +75,12 @@ export default {
         }
     },
 
+    watch: {
+        positionCount() {
+            this.$nextTick(() => this.$refs.tabs.loadTabs());
+        }
+    },
+
     created() {
         this.$http.get('role')
             .then(response => this.roles = response.data)
@@ -97,7 +103,7 @@ export default {
         updateRole(role) {
             this.roles.splice(this.roles.indexOf(this.roles.filter(r => r.id === role.id)[0]), 1, role);
             this.roleBeingEdited = null;
-            this.$refs.tabs.selectTab(0)
+            this.$ui.modal.hide('edit-role');
         },
         addRole(role) {
             this.roles.push(role);
@@ -109,13 +115,16 @@ export default {
         },
         editRole(role) {
             this.roleBeingEdited = role;
-            this.$refs.tabs.selectTab(2);
+            this.$ui.modal.show('edit-role');
         }
     },
 
     computed: {
         positions() {
             return this.allowed.filter(position => this.positionIsAvailable(position));
+        },
+        positionCount() {
+            return this.positions.length;
         },
         orderedRoles() {
             return this.roles.slice().reverse();

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-basic-tags :tags="userNames" @delete="removeUserFromRole">
+        <p-basic-tags :tags="userNames" @delete="removeUserFromRole" delete-text="Remove user from role">
 
         </p-basic-tags>
     </div>
