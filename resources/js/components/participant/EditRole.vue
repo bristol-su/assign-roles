@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-api-form :schema="form" ref="form" @submit="updateRole" button-text="Update Role">
+        <p-api-form :schema="form" ref="form" @submit="updateRole" button-text="Update Role" :busy="$isLoading('edit-role-' + role.id)">
 
         </p-api-form>
     </div>
@@ -37,7 +37,7 @@ export default {
             if(formData.hasOwnProperty('edit_role_name')) {
                 data.role_name = formData.edit_role_name;
             }
-            this.$http.patch('/role/' + this.role.id, data)
+            this.$http.patch('/role/' + this.role.id, data, {name: 'edit-role-' + this.role.id})
                 .then(response => {
                     this.$notify.success('Role updated');
                     let role = _.cloneDeep(this.role);

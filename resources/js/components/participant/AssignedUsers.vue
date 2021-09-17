@@ -32,7 +32,9 @@
                     'Are you sure you want to remove ' + this.userNames[index] + ' from the position of ' + (this.role.data.role_name ? this.role.data.role_name : this.role.position.data.name) + '?'
                 )
                     .then(() => {
-                        this.$http.delete('role/' + this.role.id + '/user/' + this.users[index].id)
+                        this.$http.delete('role/' + this.role.id + '/user/' + this.users[index].id, {
+                            name: 'delete-user-' + this.users[index].id + '-from-role-' + this.role.id
+                        })
                             .then(response => {
                                 this.$notify.success('User removed from role')
                                 this.$emit('user-deleted', this.users[index].id);
@@ -45,7 +47,9 @@
 
         computed: {
             userNames() {
-                return this.users.map(user => user.data.preferred_name ? user.data.preferred_name : user.data.first_name + ' ' + user.data.last_name);
+                return this.users
+                    .filter(user => !this.$isLoading('delete-user-' + user.id + '-from-role-' + this.role.id))
+                    .map(user => user.data.preferred_name ? user.data.preferred_name : user.data.first_name + ' ' + user.data.last_name);
             }
         }
     }

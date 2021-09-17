@@ -15,7 +15,7 @@
 
             </p-dynamic-form>
 
-            <p-button variant="primary" @click="addUser" v-if="formData.user_id !== null">
+            <p-button variant="primary" @click="addUser" :busy="$isLoading('add-user-to-role')" v-if="formData.user_id !== null">
                 Add User to Role
             </p-button>
         </p-modal>
@@ -55,7 +55,7 @@ export default {
     methods: {
         addUser() {
             if (this.formData.user_id) {
-                this.$http.patch('role/' + this.role.id + '/user/' + this.formData.user_id)
+                this.$http.patch('role/' + this.role.id + '/user/' + this.formData.user_id, {}, {name: 'add-user-to-role'})
                     .then(response => {
                         this.$notify.success('User assigned to role');
                         this.$emit('user-added', this.formData.user_id);

@@ -1253,12 +1253,12 @@ __webpack_require__.r(__webpack_exports__);
             return Object.fromEntries(Object.entries(props).filter(([_, v]) => v !== null)); // Only return non-empty values
         },
         errorKeyValue() {
-            return this.errorKey ?? this.id;
+            return this.errorKey ? this.errorKey : this.id;
         },
         componentStyling()
         {
             return {
-                'border-warning-dark border-2': this.isInvalid,
+                'border-danger-dark border-2': this.isInvalid,
                 'border-2': !this.isInvalid
             }
         }

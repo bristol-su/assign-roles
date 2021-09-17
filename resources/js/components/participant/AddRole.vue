@@ -4,7 +4,7 @@
             <p-dynamic-form :schema="form" v-model="formData">
             </p-dynamic-form>
 
-            <p-button variant="primary" @click="createRole">
+            <p-button variant="primary" @click="createRole" :busy="$isLoading('create-and-assign-role')">
                 Add Role
             </p-button>
         </p-form-padding>
@@ -13,6 +13,7 @@
 
 <script>
 import ProvidesUsers from './ProvidesUsers';
+import axios from 'axios';
 
 export default {
     name: "AddRole",
@@ -47,22 +48,34 @@ export default {
                 position_id: formData.position_id,
                 role_name: (formData.role_name ? formData.role_name : this.getPositionName(formData.position_id)),
                 email: formData.role_email ? formData.role_email : null
-            })
+            }, {name: 'create-and-assign-role'})
                 .then(response => {
-                    this.$notify.success('Role created');
-                    this.$emit('add-role', response.data);
-                    if(formData.members) {
-                        (Array.isArray(formData.members) ? formData.members : [formData.members]).forEach(memberId => {
-                            if(memberId !== null) {
-                                this.$http.patch('role/' + response.data.id + '/user/' + memberId)
-                                    .then(response => {
-
-                                    })
-                                    .catch(error => this.$notify.alert('User could not be assigned to role: ' + error.message));
-                            }
-                        })
+                    let role = response.data;
+                    let memberIds = [];
+                    if(formData.members.length > 0) {
+                        axios.all((Array.isArray(formData.members) ? formData.members : [formData.members]).map(memberId => {
+                            memberIds.push(memberId);
+                            return this.$http.patch('role/' + response.data.id + '/user/' + memberId, {}, {name: 'create-and-assign-role'});
+                        }))
+                            .then(axios.spread((...responses) => {
+                                memberIds.forEach(memberId => {
+                                    let user = this.members.filter(member => member.id === memberId);
+                                    if(user.length === 0) {
+                                        window.location.reload();
+                                    } else {
+                                        role.users.push(user[0]);
+                                    }
+                                })
+                                this.$notify.success('Role created');
+                                this.$emit('add-role', role);
+                                this.formData = {};
+                            }))
+                            .catch(error => this.$notify.alert('User could not be assigned to role: ' + error.message));
+                    } else {
+                        this.$notify.success('Role created');
+                        this.$emit('add-role', response.data);
+                        this.formData = {};
                     }
-                    this.formData = {};
                 })
                 .catch(error => {
                     this.$notify.alert('Could not create the role: ' + error.message)

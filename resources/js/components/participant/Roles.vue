@@ -8,6 +8,7 @@
                     :user-only-has-one-role="userOnlyHasOneRole"
                     :only-one-role="onlyOneRole"
                     :roles="orderedRoles"
+                    :loading="$isLoading('load-roles')"
                     @update-role="updateRole"
                     @delete-role="deleteRole"
                     :members="members"
@@ -82,7 +83,7 @@ export default {
     },
 
     created() {
-        this.$http.get('role')
+        this.$http.get('role', {name: 'load-roles'})
             .then(response => this.roles = response.data)
             .catch(error => this.$notify.alert('Could not load roles: ' + error.message));
 

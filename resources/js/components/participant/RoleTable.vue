@@ -1,9 +1,10 @@
 <template>
     <div>
-        <p-table :columns="fields" :items="roles"
+        <p-table :columns="fields" :items="tableRoles"
                  :deletable="true"
                  @delete="deleteRow"
                  :editable="true"
+                 :busy="loading"
                  @edit="$emit('edit-role', $event)">
             <template v-slot:cell(assigned)="{row}">
                 <assigned-users :users="row.users" :role="row" @user-deleted="userWasRemoved(row, $event)"></assigned-users>
@@ -61,6 +62,9 @@ export default {
         },
         members: {
             required: true, type: Array
+        },
+        loading: {
+            required: false, type: Boolean, default: false
         }
     },
 
@@ -78,12 +82,11 @@ export default {
     computed: {
         tableRoles() {
             return this.roles.map(role => {
-                return {
-                    position_name: role.position.data.name,
-                    role_name: role.data.role_name,
-                    role_email: role.data.email,
-                    users: role.users
+                if(!role.hasOwnProperty('_table')) {
+                    role._table = {}
                 }
+                role._table.isDeleting = this.$isLoading('deleting-role-' + role.id);
+                return role;
             })
         }
     },
@@ -95,7 +98,7 @@ export default {
             } else {
                 this.$ui.confirm.delete('Deleting role', 'Are you sure you want to delete this role?')
                     .then(() => {
-                        this.$http.delete('role/' + row.id)
+                        this.$http.delete('role/' + row.id, {name: 'deleting-role-' + row.id})
                             .then(response => {
                                 this.$notify.success('Deleted role')
                                 this.$emit('delete-role', row.id)
