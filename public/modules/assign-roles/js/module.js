@@ -471,7 +471,8 @@ var render = function() {
             {
               attrs: {
                 variant: "primary",
-                busy: _vm.$isLoading("create-and-assign-role")
+                busy: _vm.$isLoading("create-and-assign-role"),
+                "busy-text": "Creating Role"
               },
               on: { click: _vm.createRole }
             },
@@ -560,7 +561,8 @@ var render = function() {
                 {
                   attrs: {
                     variant: "primary",
-                    busy: _vm.$isLoading("add-user-to-role")
+                    busy: _vm.$isLoading("add-user-to-role"),
+                    "busy-text": "Assigning User"
                   },
                   on: { click: _vm.addUser }
                 },
@@ -639,7 +641,8 @@ var render = function() {
         attrs: {
           schema: _vm.form,
           "button-text": "Update Role",
-          busy: _vm.$isLoading("edit-role-" + _vm.role.id)
+          busy: _vm.$isLoading("edit-role-" + _vm.role.id),
+          "busy-text": "Updating Role"
         },
         on: { submit: _vm.updateRole }
       })

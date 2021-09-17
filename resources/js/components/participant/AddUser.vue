@@ -15,7 +15,7 @@
 
             </p-dynamic-form>
 
-            <p-button variant="primary" @click="addUser" :busy="$isLoading('add-user-to-role')" v-if="formData.user_id !== null">
+            <p-button variant="primary" @click="addUser" :busy="$isLoading('add-user-to-role')" v-if="formData.user_id !== null" busy-text="Assigning User">
                 Add User to Role
             </p-button>
         </p-modal>

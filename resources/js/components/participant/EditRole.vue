@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-api-form :schema="form" ref="form" @submit="updateRole" button-text="Update Role" :busy="$isLoading('edit-role-' + role.id)">
+        <p-api-form :schema="form" ref="form" @submit="updateRole" button-text="Update Role" :busy="$isLoading('edit-role-' + role.id)" busy-text="Updating Role">
 
         </p-api-form>
     </div>

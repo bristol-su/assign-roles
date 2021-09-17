@@ -4,7 +4,7 @@
             <p-dynamic-form :schema="form" v-model="formData">
             </p-dynamic-form>
 
-            <p-button variant="primary" @click="createRole" :busy="$isLoading('create-and-assign-role')">
+            <p-button variant="primary" @click="createRole" :busy="$isLoading('create-and-assign-role')" busy-text="Creating Role">
                 Add Role
             </p-button>
         </p-form-padding>
