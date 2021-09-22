@@ -51,7 +51,7 @@ class RoleController extends Controller
         $roleArray = $role->toArray();
         $roleArray['position'] = $role->position();
         $roleArray['users'] = $role->users();
-        return $roleArray;
+        return response()->json($roleArray, 201);
     }
 
     public function destroy(Activity $activity, ModuleInstance $moduleInstance, int $roleId, DestroyRequest $request, Role $roleRepository)

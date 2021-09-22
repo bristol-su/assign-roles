@@ -18,7 +18,7 @@ class RequiredPositionsFilledTest extends TestCase
     public function isComplete_returns_false_if_the_roles_all_exist_but_some_are_not_filled()
     {
         $group = $this->newGroup();
-        $activityInstance = factory(ActivityInstance::class)->create([
+        $activityInstance = ActivityInstance::factory()->create([
           'resource_type' => 'group', 'resource_id' => $group->id()
         ]);
         $role1 = $this->newRole(['group_id' => $group->id()]);
@@ -30,7 +30,7 @@ class RequiredPositionsFilledTest extends TestCase
         $role1->addUser($this->newUser());
         $role2->addUser($this->newUser());
         $role4->addUser($this->newUser());
-        
+
         $requiredSettings = [
           $role1->positionId(),
           $role2->positionId(),
@@ -47,7 +47,7 @@ class RequiredPositionsFilledTest extends TestCase
             return $moduleInstance->is($this->getModuleInstance());
         }))->willReturn($requiredSettings);
         $this->app->instance(RequiredSettingRetrieval::class, $requiredSettingRetrieval->reveal());
-        
+
         $cc = new RequiredPositionsFilled('mod_alias', new Role);
         $this->assertFalse($cc->isComplete(['test_settings'], $activityInstance, $this->getModuleInstance()));
     }
@@ -56,7 +56,7 @@ class RequiredPositionsFilledTest extends TestCase
     public function isComplete_returns_true_if_the_roles_all_exist_and_all_are_filled()
     {
         $group = $this->newGroup();
-        $activityInstance = factory(ActivityInstance::class)->create([
+        $activityInstance = ActivityInstance::factory()->create([
           'resource_type' => 'group', 'resource_id' => $group->id()
         ]);
         $role1 = $this->newRole(['group_id' => $group->id()]);
@@ -93,5 +93,5 @@ class RequiredPositionsFilledTest extends TestCase
         $cc->isComplete(['test_settings'], $activityInstance, $this->getModuleInstance());
         $this->assertTrue($cc->isComplete(['test_settings'], $activityInstance, $this->getModuleInstance()));
     }
-    
+
 }
