@@ -21,7 +21,7 @@ class AssignControllerTest extends TestCase
     public function update_returns_a_422_if_the_role_does_not_belong_to_the_current_group(){
         $this->bypassAuthorization();
         PermissionTester::clearResolvedInstance(\BristolSU\Support\Permissions\Contracts\PermissionTester::class);
-        
+
         $role = $this->newRole();
         $user = $this->newUser();
         app(UserGroup::class)->addUserToGroup($user, $this->getControlGroup());
@@ -30,14 +30,14 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(422);
@@ -56,20 +56,20 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['user' => 'The user is not a member of the group']);
     }
-    
+
     /** @test */
     public function update_returns_a_422_if_the_role_should_only_have_one_user_and_it_already_has_one(){
         $this->bypassAuthorization();
@@ -83,14 +83,14 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [$role->id()],
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         app(UserRole::class)->addUserToRole($this->newUser(), $role);
 
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
@@ -115,14 +115,14 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
             'user_only_has_one_role' => [$role2->id()]
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(422);
@@ -142,14 +142,14 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(403);
@@ -168,14 +168,14 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [$role->id()],
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(200);
@@ -199,14 +199,14 @@ class AssignControllerTest extends TestCase
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
         }))->shouldBeCalled()->willReturn([
-            'logic_id' => factory(Logic::class)->create()->id,
+            'logic_id' => Logic::factory()->create()->id,
             'allowed' => [],
             'only_one_role' => [],
             'only_one_user' => [],
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->patchJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(200);
@@ -215,12 +215,12 @@ class AssignControllerTest extends TestCase
             'role_id' => $role->id()
         ]);
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     /** @test */
     public function destroy_returns_a_422_if_the_role_does_not_belong_to_the_current_group(){
         $this->bypassAuthorization();
@@ -229,13 +229,13 @@ class AssignControllerTest extends TestCase
         $role = $this->newRole();
         $user = $this->newUser();
         app(UserRole::class)->addUserToRole($user, $role);
-        
+
         $response = $this->deleteJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['role' => 'The role does not belong to your group']);   
+        $response->assertJsonValidationErrors(['role' => 'The role does not belong to your group']);
     }
-    
+
     /** @test */
     public function destroy_returns_a_422_if_the_user_does_not_belong_to_the_current_role(){
         $this->bypassAuthorization();
@@ -258,7 +258,7 @@ class AssignControllerTest extends TestCase
         $role = $this->newRole(['group_id' => $this->getControlGroup()->id()]);
         $this->beRole($role);
         app(UserRole::class)->addUserToRole($this->getControlUser(), $role);
-        
+
         $this->assertDatabaseHas('control_role_user', [
             'user_id' => $this->getControlUser()->id(),
             'role_id' => $role->id(),
@@ -297,7 +297,7 @@ class AssignControllerTest extends TestCase
         ]);
 
     }
-    
+
     /** @test */
     public function destroy_returns_a_403_if_the_permission_is_not_owned(){
         $this->revokePermissionTo('assign-roles.unassign');
@@ -311,7 +311,7 @@ class AssignControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
-    
+
     /** @test */
     public function destroy_removes_the_user_from_the_role(){
         $this->givePermissionTo('assign-roles.unassign');
@@ -326,7 +326,7 @@ class AssignControllerTest extends TestCase
             'role_id' => $role->id(),
             'deleted_at' => null
         ]);
-        
+
         $response = $this->deleteJson($this->userApiUrl(sprintf('/role/%s/user/%s', $role->id(), $user->id())));
 
         $response->assertStatus(200);

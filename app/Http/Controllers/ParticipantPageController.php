@@ -12,7 +12,7 @@ class ParticipantPageController extends Controller
     public function index(Authentication $authentication)
     {
         $this->authorize('view-page');
-        
+
         try {
             $setting = app(PositionSettingRetrieval::class)->getSettings(
                 $authentication->getGroup()
@@ -23,5 +23,5 @@ class ParticipantPageController extends Controller
         }
         return view('assign-roles::participant')->with('positionSetting', $setting);
     }
-    
+
 }

@@ -22,7 +22,7 @@ class RoleController extends Controller
         $roles = $role->allThroughGroup(
             $authentication->getGroup()
         );
-        
+
         return $roles->map(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
             $roleArray = $role->toArray();
             $roleArray['position'] = $role->position();
@@ -34,7 +34,7 @@ class RoleController extends Controller
     public function store(Activity $activity, ModuleInstance $moduleInstance, StoreRequest $request, Role $roleRepository, DataRole $dataRoleRepository, Authentication $authentication)
     {
         $this->authorize('role.store');
-        
+
         $dataRole = $dataRoleRepository->create(
             $request->input('role_name'),
             $request->input('email')
@@ -45,23 +45,26 @@ class RoleController extends Controller
             $authentication->getGroup()->id(),
             $dataRole->id()
         );
-        
+
         event(new RoleCreated($role));
-        
-        return $role;
+
+        $roleArray = $role->toArray();
+        $roleArray['position'] = $role->position();
+        $roleArray['users'] = $role->users();
+        return response()->json($roleArray, 201);
     }
 
     public function destroy(Activity $activity, ModuleInstance $moduleInstance, int $roleId, DestroyRequest $request, Role $roleRepository)
     {
         $this->authorize('role.delete');
-        
+
         $roleRepository->delete($roleId);
     }
 
     public function update(Activity $activity, ModuleInstance $moduleInstance, int $roleId, UpdateRequest $request, Role $roleRepository, DataRole $dataRoleRepository)
     {
         $this->authorize('role.update');
-        
+
         $role = $roleRepository->getById($roleId);
         $dataRole = $role->data();
         $dataRole->setEmail($request->input('email', $dataRole->email()));

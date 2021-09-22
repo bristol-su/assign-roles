@@ -41,10 +41,10 @@ class RequiredPositionsFilled extends CompletionCondition
         } catch (SettingRetrievalException $e) {
             return false;
         }
-       
+
        return count($remainingPositions) === 0;
     }
-    
+
     public function percentage($settings, ActivityInstance $activityInstance, ModuleInstance $moduleInstance): int
     {
         $group = $this->getGroup($activityInstance);
@@ -55,13 +55,13 @@ class RequiredPositionsFilled extends CompletionCondition
         } catch (SettingRetrievalException $e) {
             return false;
         }
-        
+
         if(count($requiredPositions) === 0) {
             return 100;
         }
-        
+
         $filled = count($requiredPositions) - count($remainingPositions);
-        
+
         $percentage = (int) round(($filled/count($requiredPositions)) * 100, 0);
 
         if($percentage > 100) {
@@ -76,14 +76,14 @@ class RequiredPositionsFilled extends CompletionCondition
         $roles = $this->rolesThroughGroup($group, $moduleInstance)->filter(function(Role $role) {
             return $role->users()->count() > 0;
         });
-        
+
         return collect($this->getRequiredPositions($settings, $group, $moduleInstance))->filter(function(int $positionId) use ($roles) {
             return $roles->filter(function(Role $role) use ($positionId) {
                 return $role->positionId() === $positionId;
             })->count() === 0;
         });
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -91,11 +91,11 @@ class RequiredPositionsFilled extends CompletionCondition
     {
         return \FormSchema\Generator\Form::make()->withField(
             Field::make(RequiredPositions::class, 'required')
-                ->label('Required Positions')->featured(true)->required(true)
-                ->default([])->hint('Define which positions are required')
-                ->help('Define the positions that are required for any given logic group')
-                ->logic($this->getLogic())
-                ->positions($this->getPositions())
+                ->setLabel('Required Positions')->setRequired(true)
+                ->setValue([])->setHint('Define which positions are required')
+                ->setTooltip('Define the positions that are required for any given logic group')
+                ->setLogic($this->getLogic()->toArray())
+                ->setPositions($this->getPositions()->toArray())
         )->getSchema();
     }
 
@@ -143,7 +143,7 @@ class RequiredPositionsFilled extends CompletionCondition
 
     /**
      * Get the group from an activity instance
-     * 
+     *
      * @param ActivityInstance $activityInstance
      * @return Group|\BristolSU\ControlDB\Models\Group
      */
@@ -180,5 +180,5 @@ class RequiredPositionsFilled extends CompletionCondition
         }
         return (int) $id;
     }
-    
+
 }

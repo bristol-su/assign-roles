@@ -22,24 +22,24 @@ use Prophecy\Argument;
 class RoleControllerTest extends TestCase
 {
     use FakesLogicTesters;
-    
+
     /** @test */
     public function index_returns_a_403_if_permission_not_owned(){
         $this->revokePermissionTo('assign-roles.role.index');
         $response = $this->getJson($this->userApiUrl('/role'));
         $response->assertStatus(403);
     }
-    
+
     /** @test */
     public function index_returns_all_roles_through_a_group_if_no_logic_group_in_settings(){
         $this->bypassAuthorization();
-        
+
         ModuleInstanceSetting::create([
             'key' => 'logic_group',
             'value' => null,
             'module_instance_id' => $this->getModuleInstance()->id()
         ]);
-        
+
         $roles = [
             $this->newRole(['group_id' => $this->getControlGroup()]),
             $this->newRole(['group_id' => $this->getControlGroup()]),
@@ -55,7 +55,7 @@ class RoleControllerTest extends TestCase
             $this->newRole(),
             $this->newRole(),
         ];
-        
+
         $response = $this->getJson($this->userApiUrl('/role'));
         $response->assertStatus(200);
         foreach($roles as $role) {
@@ -71,19 +71,19 @@ class RoleControllerTest extends TestCase
             ]);
         }
     }
-    
+
     /** @test */
     public function index_returns_all_roles_through_a_group_that_are_also_in_the_logic_group(){
         $this->bypassAuthorization();
 
-        $logicGroup = factory(Logic::class)->create();
-        
+        $logicGroup = Logic::factory()->create();
+
         ModuleInstanceSetting::create([
             'key' => 'logic_group',
             'value' => $logicGroup->id,
             'module_instance_id' => $this->getModuleInstance()->id()
         ]);
-        
+
         $rolesInLogicGroup = [
             $this->newRole(['group_id' => $this->getControlGroup()]),
             $this->newRole(['group_id' => $this->getControlGroup()]),
@@ -107,7 +107,7 @@ class RoleControllerTest extends TestCase
             $this->newRole(),
             $this->newRole(),
         ];
-        
+
         $this->logicTester()
             ->forLogic($logicGroup)
             ->pass(null, $this->getControlGroup(), $rolesInLogicGroup[0])
@@ -129,14 +129,14 @@ class RoleControllerTest extends TestCase
             ->fail(null, $rolesNotInGroup[4]->group(), $rolesNotInGroup[4])
             ->otherwise(true);
 
-        
+
         $this->app->when(BindRoleRepository::class)
             ->needs(\BristolSU\Support\Logic\Contracts\LogicTester::class)
             ->give(function() {
                 return $this->logicTester();
             });
-        
-        
+
+
         $response = $this->getJson($this->userApiUrl('/role'));
         $response->assertStatus(200);
         foreach($rolesInLogicGroup as $role) {
@@ -158,20 +158,20 @@ class RoleControllerTest extends TestCase
             ]);
         }
     }
-    
+
     /** @test */
     public function store_creates_a_new_role()
     {
         $this->givePermissionTo('assign-roles.role.store');
-        
-        $position = factory(Position::class)->create();
-        
+
+        $position = Position::factory()->create();
+
         $attributes = [
             'position_id' => $position->id(),
             'role_name' => 'Role Name 1',
             'email' => 'example@example.com'
         ];
-        
+
         $positionSettingRetrieval = $this->prophesize(PositionSettingRetrieval::class);
         $positionSettingRetrieval->getSettings(Argument::that(function($arg) {
             return $arg instanceof Group && $arg->is($this->getControlGroup());
@@ -182,10 +182,10 @@ class RoleControllerTest extends TestCase
             'user_only_has_one_role' => []
         ]);
         $this->instance(PositionSettingRetrieval::class, $positionSettingRetrieval->reveal());
-        
+
         $response = $this->postJson($this->userApiUrl('role'), $attributes);
         $response->assertStatus(201);
-        
+
         $this->assertDatabaseHas('control_roles', [
             'position_id' => $position->id()
         ]);
@@ -200,7 +200,7 @@ class RoleControllerTest extends TestCase
     public function store_can_create_a_role_without_an_email(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
 
         $attributes = [
             'position_id' => $position->id(),
@@ -234,7 +234,7 @@ class RoleControllerTest extends TestCase
     public function store_returns_the_role(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
 
         $attributes = [
             'position_id' => $position->id(),
@@ -258,19 +258,19 @@ class RoleControllerTest extends TestCase
 
         $this->assertCount(1, Role::all());
         $role = Role::all()->first();
-        
+
         $response->assertJson([
             'id' => $role->id(),
             'data_provider_id' => (string) $role->dataProviderId()
         ]);
-        
+
     }
 
     /** @test */
     public function store_creates_a_role_belonging_to_the_group(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
 
         $attributes = [
             'position_id' => $position->id(),
@@ -297,12 +297,12 @@ class RoleControllerTest extends TestCase
             'group_id' => $this->getControlGroup()->id()
         ]);
     }
-    
+
     /** @test */
     public function store_creates_a_new_role_if_only_one_role_exists_but_no_roles_exist(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
 
         $attributes = [
             'position_id' => $position->id(),
@@ -337,7 +337,7 @@ class RoleControllerTest extends TestCase
     public function store_returns_a_403_if_the_permission_is_not_owned(){
         $this->revokePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
 
         $attributes = [
             'position_id' => $position->id(),
@@ -364,9 +364,9 @@ class RoleControllerTest extends TestCase
     public function store_returns_a_422_if_only_one_role_exists_and_one_role_already_exists(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
         $role1 = $this->newRole(['position_id' => $position->id(), 'group_id' => $this->getControlGroup()->id()]);
-        
+
         $attributes = [
             'position_id' => $position->id(),
             'role_name' => 'Role Name 1',
@@ -393,7 +393,7 @@ class RoleControllerTest extends TestCase
     public function store_returns_a_201_if_only_one_role_exists_and_one_role_already_exists_but_from_a_different_group(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
         $role1 = $this->newRole(['position_id' => $position->id()]);
 
         $attributes = [
@@ -421,8 +421,8 @@ class RoleControllerTest extends TestCase
     public function store_returns_a_422_if_the_position_is_not_in_allowed(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
-        
+        $position = Position::factory()->create();
+
         $attributes = [
             'position_id' => $position->id(),
             'role_name' => 'Role Name 1',
@@ -448,7 +448,7 @@ class RoleControllerTest extends TestCase
             'position_id' => $position->id()
         ]);
     }
-    
+
     /** @test */
     public function store_returns_a_422_if_the_position_id_is_not_given(){
         $this->givePermissionTo('assign-roles.role.store');
@@ -474,12 +474,12 @@ class RoleControllerTest extends TestCase
         $response->assertJsonValidationErrors(['position_id' => 'The position id field is required']);
 
     }
-    
+
     /** @test */
     public function store_returns_a_422_if_the_email_is_not_an_email(){
         $this->givePermissionTo('assign-roles.role.store');
 
-        $position = factory(Position::class)->create();
+        $position = Position::factory()->create();
 
         $attributes = [
             'position_id' => $position->id(),
@@ -502,7 +502,7 @@ class RoleControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email' => 'The email must be a valid email address']);
     }
-    
+
     /** @test */
     public function destroy_deletes_a_role(){
         $this->givePermissionTo('assign-roles.role.delete');
@@ -511,15 +511,15 @@ class RoleControllerTest extends TestCase
         $this->assertDatabaseHas('control_roles', [
             'id' => $role->id()
         ]);
-        
+
         $response = $this->deleteJson($this->userApiUrl('/role/' . $role->id()));
         $response->assertStatus(200);
-        
+
         $this->assertSoftDeleted('control_roles', [
             'id' => $role->id()
         ]);
     }
-    
+
     /** @test */
     public function destroy_returns_a_422_if_the_role_does_not_belong_to_the_group(){
         $this->bypassAuthorization();
@@ -529,7 +529,7 @@ class RoleControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['role' => 'The role does not belong to your group']);
     }
-    
+
     /** @test */
     public function destroy_returns_a_422_if_the_role_has_users_assigned(){
         $this->bypassAuthorization();
@@ -538,12 +538,12 @@ class RoleControllerTest extends TestCase
         $user2 = $this->newUser();
         app(UserRole::class)->addUserToRole($user1, $role);
         app(UserRole::class)->addUserToRole($user2, $role);
-        
+
         $response = $this->deleteJson($this->userApiUrl('/role/' . $role->id()));
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['role' => 'The role still has users assigned']);
     }
-    
+
     /** @test */
     public function destroy_returns_a_403_if_the_permission_is_not_owned(){
         $this->revokePermissionTo('assign-roles.role.delete');
@@ -552,15 +552,15 @@ class RoleControllerTest extends TestCase
         $response = $this->deleteJson($this->userApiUrl('/role/' . $role->id()));
         $response->assertStatus(403);
     }
-    
+
     /** @test */
     public function update_updates_a_role(){
         $this->givePermissionTo('assign-roles.role.update');
-        $dataRole = factory(DataRole::class)->create([
+        $dataRole = DataRole::factory()->create([
             'role_name' => 'OldName', 'email' => 'OldEmail@example.com'
         ]);
         $role = $this->newRole(['data_provider_id' => $dataRole->id(), 'group_id' => $this->getControlGroup()->id()]);
-        
+
         $response = $this->patchJson($this->userApiUrl('/role/' . $role->id()), [
             'role_name' => 'NewName', 'email' => 'NewEmail@example.com'
         ]);
@@ -569,11 +569,11 @@ class RoleControllerTest extends TestCase
             'role_name' => 'NewName', 'email' => 'NewEmail@example.com'
         ]);
     }
-    
+
     /** @test */
     public function update_can_update_just_the_role_name(){
         $this->bypassAuthorization();
-        $dataRole = factory(DataRole::class)->create([
+        $dataRole = DataRole::factory()->create([
             'role_name' => 'OldName', 'email' => 'OldEmail@example.com'
         ]);
         $role = $this->newRole(['data_provider_id' => $dataRole->id(), 'group_id' => $this->getControlGroup()->id()]);
@@ -586,11 +586,11 @@ class RoleControllerTest extends TestCase
             'role_name' => 'NewName', 'email' => 'OldEmail@example.com'
         ]);
     }
-    
+
     /** @test */
     public function update_can_update_just_the_role_email(){
         $this->givePermissionTo('assign-roles.role.update');
-        $dataRole = factory(DataRole::class)->create([
+        $dataRole = DataRole::factory()->create([
             'role_name' => 'OldName', 'email' => 'OldEmail@example.com'
         ]);
         $role = $this->newRole(['data_provider_id' => $dataRole->id(), 'group_id' => $this->getControlGroup()->id()]);
@@ -607,7 +607,7 @@ class RoleControllerTest extends TestCase
     /** @test */
     public function update_returns_the_new_role(){
         $this->givePermissionTo('assign-roles.role.update');
-        $dataRole = factory(DataRole::class)->create([
+        $dataRole = DataRole::factory()->create([
             'role_name' => 'OldName', 'email' => 'OldEmail@example.com'
         ]);
         $role = $this->newRole(['data_provider_id' => $dataRole->id(), 'group_id' => $this->getControlGroup()->id()]);
@@ -627,9 +627,9 @@ class RoleControllerTest extends TestCase
     /** @test */
     public function update_does_not_update_the_position_id(){
         $this->givePermissionTo('assign-roles.role.update');
-        $position = factory(Position::class)->create();
-        $newPosition = factory(Position::class)->create();
-        
+        $position = Position::factory()->create();
+        $newPosition = Position::factory()->create();
+
         $role = $this->newRole(['group_id' => $this->getControlGroup()->id(), 'position_id' => $position->id()]);
 
         $response = $this->patchJson($this->userApiUrl('/role/' . $role->id()), [
@@ -659,7 +659,7 @@ class RoleControllerTest extends TestCase
     /** @test */
     public function update_returns_a_422_if_the_email_is_not_valid(){
         $this->givePermissionTo('assign-roles.role.update');
-        $dataRole = factory(DataRole::class)->create([
+        $dataRole = DataRole::factory()->create([
             'role_name' => 'OldName', 'email' => 'OldEmail@example.com'
         ]);
         $role = $this->newRole(['data_provider_id' => $dataRole->id(), 'group_id' => $this->getControlGroup()->id()]);
@@ -671,6 +671,6 @@ class RoleControllerTest extends TestCase
         $response->assertJsonValidationErrors(['email' => 'The email must be a valid email address']);
 
     }
-    
-    
+
+
 }

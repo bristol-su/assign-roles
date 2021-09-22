@@ -1,92 +1,94 @@
 <template>
     <div>
-        <b-button size="sm" v-b-modal="'edit-role-' + role.id" variant="outline-info">
-            <i class="fa fa-edit"></i>Edit
-        </b-button>
+        <p-api-form :schema="form" ref="form" @submit="updateRole" button-text="Update Role" :busy="$isLoading('edit-role-' + role.id)" busy-text="Updating Role">
 
-        <b-modal :id="'edit-role-' + role.id" ok-only ok-title="Cancel" ok-variant="danger">
-            <b-form @submit.prevent="editRole">
-
-                <b-form-group
-                        description="What should the role be called?"
-                        id="role-name-group"
-                        label="Role Title"
-                        label-for="role-name"
-                >
-                    <b-form-input
-                            id="role-name"
-                            required
-                            type="text"
-                            v-model="name"
-                    ></b-form-input>
-                </b-form-group>
-
-                <b-form-group
-                        id="role-email-group"
-                        label="Generic Role Email"
-                        label-for="role-email"
-                        description="Is there a generic email for this role, e.g. president@society.co.uk?"
-                >
-                    <b-form-input
-                            id="role-email"
-                            type="email"
-                            v-model="email"
-                    ></b-form-input>
-                </b-form-group>
-                <b-button type="submit" variant="primary">Submit</b-button>
-            </b-form>
-        </b-modal>
+        </p-api-form>
     </div>
 </template>
 
 <script>
-    export default {
-        name: "EditRole",
+import _ from 'lodash';
 
-        props: {
-            role: {
-                required: true,
-                type: Object
-            }
+export default {
+    name: "EditRole",
+    props: {
+        positions: {
+            required: true,
+            type: Array
         },
+        role: {
+            required: true,
+            type: Object
+        }
+    },
 
-        data() {
+    methods: {
+        getPositionName(positionId) {
+            if (this.positions.filter(p => p.id === positionId).length > 0) {
+                return this.positions.filter(p => p.id === positionId)[0].data.name;
+            }
+            return 'position #' + positionId;
+        },
+        updateRole(formData) {
+            let data = {};
+            if(formData.hasOwnProperty('edit_role_email')) {
+                data.email = formData.edit_role_email;
+            }
+            if(formData.hasOwnProperty('edit_role_name')) {
+                data.role_name = formData.edit_role_name;
+            }
+            this.$http.patch('/role/' + this.role.id, data, {name: 'edit-role-' + this.role.id})
+                .then(response => {
+                    this.$notify.success('Role updated');
+                    let role = _.cloneDeep(this.role);
+                    role.data = response.data;
+                    this.$refs.form.reset();
+                    this.$emit('updated-role', role);
+                })
+                .catch(error => {
+                    this.$notify.alert('Could not update the role: ' + error.message)
+                });
+        }
+    },
+    watch: {
+        role() {
+            this.formData = {};
+        }
+    },
+    computed: {
+        roleData()
+        {
             return {
-                name: null,
-                email: null
-            }
+                name: this.role.data.role_name,
+                email: this.role.data.email
+            };
         },
+        form() {
+            let role = this.roleData;
 
-        created() {
-            this.name = this.role.data.role_name;
-            this.email = this.role.data.email;
-        },
-
-        methods: {
-            editRole() {
-                let self = this;
-                let attributes = {};
-                if (this.name !== this.role.data.role_name) {
-                    attributes['role_name'] = this.name;
-                }
-                if (this.email !== this.role.data.email) {
-                    attributes['email'] = this.email;
-                }
-                this.$http.patch('/role/' + this.role.id, attributes)
-                    .then(response => {
-                        this.$notify.success('Role updated');
-                        self.$root.$emit('triggerRefresh');
-                    })
-                    .catch(error => this.$notify.alert('Could not update role: ' + error.message));
-            },
-        },
-
-        computed: {
-            positions() {
-                return this.allowed.filter(position => this.positionIsAvailable(position));
-            }
+            return this.$tools.generator.form.newForm('Edit a Role')
+                .withGroup(this.$tools.generator.group.newGroup()
+                    .withField(
+                        this.$tools.generator.field.text('edit_role_name')
+                            .label('Role Title')
+                            .hint('What should the role be called? e.g. President')
+                            .required(false)
+                            .value(role.name)
+                            .errorKey('role_name')
+                    )
+                    .withField(
+                        this.$tools.generator.field.text('edit_role_email')
+                            .label('Role Email Address')
+                            .hint('Do you have a generic email address that\'s not a users email address for this role that we may need to contact?')
+                            .required(false)
+                            .value(role.email)
+                            .errorKey('email')
+                    )
+                ).generate()
+                .asJson();
         }
     }
+}
 </script>
 
 <style scoped>

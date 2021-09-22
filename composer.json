@@ -16,7 +16,6 @@
     },
     "require-dev": {
         "orchestra/testbench": "^6.19",
-        "laravel/legacy-factories": "^1.1",
         "phpspec/prophecy-phpunit": "^2.0"
     },
     "autoload": {
