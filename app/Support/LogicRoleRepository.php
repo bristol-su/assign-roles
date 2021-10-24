@@ -5,7 +5,7 @@ namespace BristolSU\Module\AssignRoles\Support;
 use BristolSU\ControlDB\Contracts\Models\Role as RoleModel;
 use BristolSU\ControlDB\Contracts\Repositories\Role;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
-use BristolSU\Support\Logic\Facade\LogicTester;
+use BristolSU\Support\Logic\Contracts\LogicTester;
 use Illuminate\Support\Collection;
 
 class LogicRoleRepository implements Role
@@ -16,11 +16,11 @@ class LogicRoleRepository implements Role
      */
     private $roleRepository;
     /**
-     * @var \BristolSU\Support\Logic\Contracts\LogicTester
+     * @var LogicTester
      */
     private $logicTester;
 
-    public function __construct(Role $roleRepository, \BristolSU\Support\Logic\Contracts\LogicTester $logicTester)
+    public function __construct(Role $roleRepository, LogicTester $logicTester)
     {
         $this->roleRepository = $roleRepository;
         $this->logicTester = $logicTester;
@@ -103,8 +103,8 @@ class LogicRoleRepository implements Role
             $this->logicGroupId()
         );
     }
-    
-    private function isInLogicGroup(\BristolSU\ControlDB\Contracts\Models\Role $role)
+
+    private function isInLogicGroup(RoleModel $role)
     {
         return $this->logicTester->evaluate($this->logicGroup(), null, $role->group(), $role);
     }
@@ -112,9 +112,7 @@ class LogicRoleRepository implements Role
     private function filter(Collection $roles)
     {
         if($this->hasLogicGroup()) {
-            return $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
-                return $this->isInLogicGroup($role);
-            })->values();
+            return $roles->filter(fn(RoleModel $role) => $this->isInLogicGroup($role))->values();
         }
         return $roles;
     }
