@@ -3,8 +3,6 @@
 namespace BristolSU\Module\AssignRoles\Support;
 
 use BristolSU\ControlDB\Contracts\Models\Group;
-use BristolSU\ControlDB\Contracts\Repositories\Position;
-use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\ModuleInstance;
@@ -17,20 +15,10 @@ class RequiredSettingRetrieval
      * @var LogicRepository
      */
     private $logicRepository;
-    /**
-     * @var LogicAudience
-     */
-    private $logicAudience;
-    /**
-     * @var Position
-     */
-    private $positionRepository;
 
-    public function __construct(LogicRepository $logicRepository, LogicAudience $logicAudience, Position $positionRepository)
+    public function __construct(LogicRepository $logicRepository)
     {
         $this->logicRepository = $logicRepository;
-        $this->logicAudience = $logicAudience;
-        $this->positionRepository = $positionRepository;
     }
 
     public function getSettings(Group $group, array $settings, ModuleInstance $moduleInstance)
@@ -51,7 +39,7 @@ class RequiredSettingRetrieval
     {
         return RequiredSettingRetrieval::class . '.' . $moduleInstance->id() . '.' . $group->id();
     }
-    
+
     protected function groupIsForSetting(Group $group, array $setting): bool
     {
         if (!array_key_exists('logic_id', $setting)) {

@@ -9,8 +9,6 @@ use BristolSU\Support\Logic\Contracts\Audience\LogicAudience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Contracts\LogicTester;
 use BristolSU\Support\ModuleInstance\ModuleInstance;
-use Exception;
-use Illuminate\Support\Facades\Cache;
 
 class PositionSettingRetrieval
 {
@@ -20,18 +18,13 @@ class PositionSettingRetrieval
      */
     private $logicRepository;
     /**
-     * @var LogicAudience
-     */
-    private $logicAudience;
-    /**
      * @var Position
      */
     private $positionRepository;
 
-    public function __construct(LogicRepository $logicRepository, LogicAudience $logicAudience, Position $positionRepository)
+    public function __construct(LogicRepository $logicRepository, Position $positionRepository)
     {
         $this->logicRepository = $logicRepository;
-        $this->logicAudience = $logicAudience;
         $this->positionRepository = $positionRepository;
     }
 
@@ -50,7 +43,7 @@ class PositionSettingRetrieval
     {
         $user = app(Authentication::class)->getUser();
         $role = app(Authentication::class)->getRole();
-        
+
         if (!array_key_exists('logic_id', $setting)) {
             return false;
         }
@@ -70,7 +63,7 @@ class PositionSettingRetrieval
         }
         return PositionSettingRetrieval::class . '.' . $moduleInstance->id() . '.' . $group->id();
     }
-    
+
     public function parse($setting)
     {
         foreach ($setting['allowed'] as $index => $id) {
