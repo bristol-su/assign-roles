@@ -11,6 +11,7 @@ use BristolSU\Module\AssignRoles\Support\RequiredSettingRetrieval;
 use BristolSU\Module\AssignRoles\Support\SettingRetrievalException;
 use BristolSU\Support\ActivityInstance\ActivityInstance;
 use BristolSU\Support\Completion\Contracts\CompletionCondition;
+use BristolSU\Support\Logic\Audience\Audience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\Contracts\ModuleInstance;
@@ -165,9 +166,10 @@ class RequiredPositionsFilled extends CompletionCondition
         $roles = $group->roles();
         if($this->logicGroupId($moduleInstance) !== null) {
             $logicGroup = app(LogicRepository::class)->getById($this->logicGroupId($moduleInstance));
-            return $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($moduleInstance, $logicGroup) {
-                return LogicTester::evaluate($logicGroup, null, $role->group(), $role);
-            })->values();
+            return Audience::getRolesInLogicGroup($logicGroup)
+                ->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) use ($group) {
+                    return $role->groupId() === $group->id();
+                })->values();
         }
         return $roles;
     }

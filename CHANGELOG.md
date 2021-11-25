@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Change how the required position filled completion condition works
+
 ## [v3.0.1]
 
 ### Fixed
