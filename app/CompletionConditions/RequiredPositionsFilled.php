@@ -43,7 +43,7 @@ class RequiredPositionsFilled extends CompletionCondition
         } catch (SettingRetrievalException $e) {
             return false;
         }
-        Log::info(json_encode($remainingPositions));
+
        return count($remainingPositions) === 0;
     }
 
