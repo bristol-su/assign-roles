@@ -3,6 +3,7 @@
 namespace BristolSU\Module\AssignRoles\Support;
 
 use BristolSU\ControlDB\Contracts\Models\Group;
+use BristolSU\Support\Logic\Audience\Audience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\ModuleInstance;
@@ -32,6 +33,7 @@ class RequiredSettingRetrieval
                 return $setting['required'];
             }
         }
+
         throw new SettingRetrievalException('Could not find a setting');
     }
 
@@ -46,7 +48,7 @@ class RequiredSettingRetrieval
             return false;
         }
         $logic = $this->logicRepository->getById($setting['logic_id']);
-        return LogicTester::evaluate($logic, null, $group, null);
+        return Audience::audience($logic, null, $group)->count() > 0;
     }
 
 }

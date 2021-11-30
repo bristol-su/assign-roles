@@ -50,7 +50,6 @@ class RequiredPositionsFilled extends CompletionCondition
     public function percentage($settings, ActivityInstance $activityInstance, ModuleInstance $moduleInstance): int
     {
         $group = $this->getGroup($activityInstance);
-
         try {
             $requiredPositions = $this->getRequiredPositions($settings, $group, $moduleInstance);
             $remainingPositions = $this->positionsStillToFill($settings, $activityInstance, $moduleInstance);

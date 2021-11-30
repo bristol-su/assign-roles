@@ -4,6 +4,7 @@ namespace BristolSU\Module\AssignRoles\Support;
 
 use BristolSU\ControlDB\Contracts\Models\Role as RoleModel;
 use BristolSU\ControlDB\Contracts\Repositories\Role;
+use BristolSU\Support\Logic\Audience\Audience;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
 use BristolSU\Support\Logic\Contracts\LogicTester;
 use Illuminate\Support\Collection;
@@ -106,7 +107,7 @@ class LogicRoleRepository implements Role
 
     private function isInLogicGroup(RoleModel $role)
     {
-        return $this->logicTester->evaluate($this->logicGroup(), null, $role->group(), $role);
+        return Audience::audience($this->logicGroup(), null, $role->group(), $role)->count() > 0;
     }
 
     private function filter(Collection $roles)
