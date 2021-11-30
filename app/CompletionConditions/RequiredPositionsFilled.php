@@ -17,6 +17,7 @@ use BristolSU\Support\Logic\Facade\LogicTester;
 use BristolSU\Support\ModuleInstance\Contracts\ModuleInstance;
 use FormSchema\Generator\Field;
 use FormSchema\Schema\Form;
+use Illuminate\Support\Facades\Log;
 
 class RequiredPositionsFilled extends CompletionCondition
 {
@@ -42,7 +43,7 @@ class RequiredPositionsFilled extends CompletionCondition
         } catch (SettingRetrievalException $e) {
             return false;
         }
-
+        Log::info(json_encode($remainingPositions));
        return count($remainingPositions) === 0;
     }
 
