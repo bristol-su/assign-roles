@@ -113,7 +113,7 @@ class LogicRoleRepository implements Role
     private function filter(Collection $roles)
     {
         if($this->hasLogicGroup()) {
-            return $roles->filter(fn(RoleModel $role) => $this->isInLogicGroup($role))->values();
+            return $roles->filter(fn(RoleModel $role) => $this->isInLogicGroup($role) || $role->users()->count() === 0)->values();
         }
         return $roles;
     }
