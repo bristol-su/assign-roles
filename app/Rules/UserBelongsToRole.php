@@ -35,6 +35,7 @@ class UserBelongsToRole implements Rule
     public function passes($attribute, $value)
     {
         return $this->userRepository->getById($value)->roles()->filter(function(Role $role) {
+            \Log::info(sprintf('Checking role id %u to ensure they have role %u', $role->id(), $this->roleId));
             return $role->id() === $this->roleId;
         })->count() > 0;
     }
