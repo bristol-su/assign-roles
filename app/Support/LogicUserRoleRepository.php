@@ -3,6 +3,8 @@
 namespace BristolSU\Module\AssignRoles\Support;
 
 use BristolSU\ControlDB\Contracts\Models\Role;
+use BristolSU\ControlDB\Contracts\Models\Role as RoleModel;
+use BristolSU\ControlDB\Contracts\Models\Tags\RoleTag;
 use BristolSU\ControlDB\Contracts\Models\User;
 use BristolSU\ControlDB\Contracts\Repositories\Pivots\UserRole;
 use BristolSU\Support\Logic\Contracts\LogicRepository;
@@ -25,7 +27,7 @@ class LogicUserRoleRepository implements UserRole
         $this->userRoleRepository = $userRoleRepository;
         $this->logicTester = $logicTester;
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -87,9 +89,7 @@ class LogicUserRoleRepository implements UserRole
     private function filter(Collection $roles)
     {
         if($this->hasLogicGroup()) {
-            return $roles->filter(function(\BristolSU\ControlDB\Contracts\Models\Role $role) {
-                return $this->isInLogicGroup($role);
-            })->values();
+            return $roles->filter(fn(RoleModel $role) => $this->isInLogicGroup($role) || $role->tags()->filter(fn(RoleTag $roleTag) => $roleTag->fullReference() === 'committee_year.y2022')->count() > 0)->values();
         }
         return $roles;
     }
