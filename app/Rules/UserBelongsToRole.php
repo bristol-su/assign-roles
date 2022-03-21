@@ -35,7 +35,7 @@ class UserBelongsToRole implements Rule
     {
         \Log::info('About  to check roles');
         \Log::info(sprintf('Useer #%u has role %u?', $value, $this->roleId));
-        \Log::info(sprintf('User has %u roles'), $this->userRepository->getById($value)->roles()->count());
+        \Log::info(sprintf('User has %u roles', $this->userRepository->getById($value)->roles()->count()));
         \Log::info(sprintf('Those roles are %s.', $this->userRepository->getById($value)->roles()->map(fn(Role $role) => $role->id())->join(', ')));
         return $this->userRepository->getById($value)->roles()->filter(function(Role $role) {
             \Log::info(sprintf('Checking role id %u to ensure they have role %u', $role->id(), $this->roleId));
