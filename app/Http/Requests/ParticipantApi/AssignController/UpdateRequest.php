@@ -18,9 +18,9 @@ class UpdateRequest extends FormRequest
             ['role' => $this->route('role'), 'user' => $this->route('user')],
             [
                 'role' => ['required', app(RoleBelongsToGroup::class), app(RoleHasSpaceToAssign::class)],
-                'user' => ['required', app(UserBelongsToGroup::class), app(UserIsAvailableToBeAssigned::class)]
+                'user' => ['required', app(UserIsAvailableToBeAssigned::class)]
             ]
         );
     }
-    
+
 }
